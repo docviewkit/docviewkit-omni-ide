@@ -1,0 +1,40 @@
+{
+  "name": "docviewkit-omni",
+  "displayName": "DocViewKit Omni",
+  "description": "Private, browser-local, read-only document preview in VS Code.",
+  "version": "0.1.5",
+  "publisher": "docviewkit",
+  "license": "SEE LICENSE IN viewer/package/FREE_VIEWER_LICENSE.md",
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": ["Visualization", "Other"],
+  "main": "./dist/extension.js",
+  "type": "module",
+  "activationEvents": ["onCustomEditor:docviewkitOmni.preview"],
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "docviewkitOmni.preview",
+        "displayName": "DocViewKit Omni",
+        "selector": [
+          {
+            "filenamePattern": "*.{pptx,pptm,ppsx,ppsm,potx,potm,xlsx,xlsm,xltx,xltm,docx,docm,dotx,dotm,csv,rtf,odp,otp,fodp,ods,ots,fods,odt,ott,fodt,pages,numbers,key,doc,xls,ppt,wps,et,dps,pdf,xps,oxps}"
+          }
+        ],
+        "priority": "default"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "test": "npm run compile && node --test test/*.test.mjs",
+    "package": "vsce package --no-dependencies --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.12",
+    "@types/vscode": "1.125.0",
+    "@vscode/vsce": "3.9.2",
+    "typescript": "5.9.3"
+  }
+}

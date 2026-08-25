@@ -1,0 +1,14 @@
+{
+  "interfaceVersion": 1,
+  "extensions": [
+    "pptx", "pptm", "ppsx", "ppsm", "potx", "potm",
+    "xlsx", "xlsm", "xltx", "xltm",
+    "docx", "docm", "dotx", "dotm",
+    "csv", "rtf",
+    "odp", "otp", "fodp", "ods", "ots", "fods", "odt", "ott", "fodt",
+    "pages", "numbers", "key",
+    "doc", "xls", "ppt",
+    "wps", "et", "dps",
+    "pdf", "xps", "oxps"
+  ]
+}

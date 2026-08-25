@@ -1,0 +1,13 @@
+<idea-plugin>
+  <id>com.docviewkit.omni</id>
+  <name>DocViewKit Omni</name>
+  <vendor url="https://docviewkit.com">DocViewKit</vendor>
+  <description><![CDATA[
+    Read-only, browser-local document preview powered by the pinned DocViewKit Viewer package.
+    Document bytes stay in the IDE and are never uploaded by the plugin.
+  ]]></description>
+  <depends>com.intellij.modules.platform</depends>
+  <extensions defaultExtensionNs="com.intellij">
+    <fileEditorProvider implementation="com.docviewkit.omni.DocViewKitFileEditorProvider"/>
+  </extensions>
+</idea-plugin>

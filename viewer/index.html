@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="{{CSP}}">
+  <link rel="icon" href="data:,">
+  <title>DocViewKit Omni</title>
+  <style nonce="{{NONCE}}">
+    html, body, docviewkit-viewer { width: 100%; height: 100%; margin: 0; }
+    body { overflow: hidden; background: var(--vscode-editor-background, #fff); }
+  </style>
+</head>
+<body>
+  <docviewkit-viewer></docviewkit-viewer>
+  <script nonce="{{NONCE}}">{{HOST_BOOTSTRAP}}</script>
+  <script nonce="{{NONCE}}" type="module" src="{{HOST_SCRIPT}}"></script>
+</body>
+</html>

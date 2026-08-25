@@ -1,0 +1,11 @@
+.DS_Store
+.idea/
+.vscode-test/
+node_modules/
+dist/
+build/
+out/
+.gradle/
+.intellijPlatform/
+/vscode/viewer/
+/vscode/*.vsix
