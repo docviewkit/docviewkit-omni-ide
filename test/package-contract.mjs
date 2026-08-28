@@ -28,10 +28,14 @@ async function verify(viewerRoot, manifest) {
 }
 
 try {
+  const vscodeVersion = JSON.parse(await readFile(join(root, "vscode/package.json"), "utf8")).version;
+  const jetbrainsVersion = (await readFile(join(root, "jetbrains/build.gradle.kts"), "utf8"))
+    .match(/^version = "([^"]+)"$/mu)?.[1];
+  assert.ok(jetbrainsVersion, "JetBrains plugin version missing");
   const vscode = join(temp, "vscode");
   const jetbrains = join(temp, "jetbrains");
-  unpack(join(root, "vscode/docviewkit-omni-0.1.0.vsix"), vscode);
-  unpack(join(root, "jetbrains/build/distributions/docviewkit-omni-0.1.0.zip"), jetbrains);
+  unpack(join(root, `vscode/docviewkit-omni-${vscodeVersion}.vsix`), vscode);
+  unpack(join(root, `jetbrains/build/distributions/docviewkit-omni-${jetbrainsVersion}.zip`), jetbrains);
   const jar = await find(jetbrains, ".jar");
   assert.ok(jar, "JetBrains plugin jar missing");
   const jarRoot = join(temp, "jar");

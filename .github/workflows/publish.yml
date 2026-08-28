@@ -1,0 +1,111 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing vX.Y.Z tag to publish
+        required: true
+        type: string
+      target:
+        description: Marketplace target
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - vscode
+          - jetbrains
+
+jobs:
+  build:
+    if: ${{ github.event_name == 'workflow_dispatch' || !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.event.release.tag_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: npm ci
+      - name: Check release version
+        env:
+          TAG: ${{ inputs.tag || github.event.release.tag_name }}
+        run: |
+          version="${TAG#v}"
+          test "$(node -p "require('./package.json').version")" = "$version"
+          test "$(node -p "require('./vscode/package.json').version")" = "$version"
+          test "$(sed -n 's/^version = "\([^"]*\)"$/\1/p' jetbrains/build.gradle.kts)" = "$version"
+      - run: npm test
+      - run: npm run test:browser
+        env:
+          DOCVIEWKIT_CHROME: /usr/bin/google-chrome
+      - run: xvfb-run -a npm run test:vscode-host
+      - run: npm run package:vscode
+      - run: ./jetbrains/gradlew -p jetbrains clean test buildPlugin verifyPluginStructure verifyPlugin
+      - run: npm run test:packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: marketplace-packages
+          path: |
+            vscode/*.vsix
+            jetbrains/build/distributions/*.zip
+          if-no-files-found: error
+
+  vscode:
+    needs: build
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'vscode' }}
+    runs-on: ubuntu-latest
+    environment: marketplace
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: marketplace-packages
+          path: marketplace-packages
+      - name: Publish VS Code extension
+        env:
+          TAG: ${{ inputs.tag || github.event.release.tag_name }}
+          VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+        run: npx vsce publish --packagePath "marketplace-packages/vscode/docviewkit-omni-${TAG#v}.vsix" --skip-duplicate
+
+  jetbrains:
+    needs: build
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'jetbrains' }}
+    runs-on: ubuntu-latest
+    environment: marketplace
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: npm ci
+      - name: Publish JetBrains plugin
+        run: ./jetbrains/gradlew -p jetbrains publishPlugin
+        env:
+          PUBLISH_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}
+          CERTIFICATE_CHAIN: ${{ secrets.JETBRAINS_CERTIFICATE_CHAIN }}
+          PRIVATE_KEY: ${{ secrets.JETBRAINS_PRIVATE_KEY }}
+          PRIVATE_KEY_PASSWORD: ${{ secrets.JETBRAINS_PRIVATE_KEY_PASSWORD }}

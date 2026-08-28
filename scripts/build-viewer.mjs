@@ -9,13 +9,14 @@ const output = resolve(root, process.argv[2] || "build/viewer");
 if (["/", root, resolve(homedir())].includes(output)) throw new Error(`Refusing unsafe output path: ${output}`);
 
 const packageRoot = join(root, "node_modules/@docviewkit/viewer");
-const [contract, packageJson, lock] = await Promise.all([
+const [contract, rootPackage, packageJson, lock] = await Promise.all([
   readFile(join(root, "viewer/contract.json"), "utf8").then(JSON.parse),
+  readFile(join(root, "package.json"), "utf8").then(JSON.parse),
   readFile(join(packageRoot, "package.json"), "utf8").then(JSON.parse),
   readFile(join(root, "package-lock.json"), "utf8").then(JSON.parse),
 ]);
 const locked = lock.packages?.["node_modules/@docviewkit/viewer"];
-if (packageJson.version !== "0.2.53" || locked?.version !== packageJson.version || !locked.integrity) {
+if (packageJson.version !== rootPackage.dependencies?.["@docviewkit/viewer"] || locked?.version !== packageJson.version || !locked.integrity) {
   throw new Error("@docviewkit/viewer must be installed from the pinned lockfile");
 }
 

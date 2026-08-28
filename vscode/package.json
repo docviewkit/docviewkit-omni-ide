@@ -2,7 +2,7 @@
   "name": "docviewkit-omni",
   "displayName": "DocViewKit Omni",
   "description": "Private, browser-local, read-only document preview in VS Code.",
-  "version": "0.1.5",
+  "version": "0.1.11",
   "publisher": "docviewkit",
   "license": "SEE LICENSE IN viewer/package/FREE_VIEWER_LICENSE.md",
   "engines": {

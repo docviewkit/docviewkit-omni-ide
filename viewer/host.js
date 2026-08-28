@@ -8,6 +8,15 @@ let generation = 0;
 
 if (!viewer || !host?.postMessage) throw new Error("DocViewKit Omni host bootstrap is unavailable");
 
+const layout = document.createElement("style");
+layout.textContent = `
+  @container docviewkit (min-width: 721px) {
+    .toolbar { position: relative; padding-inline: 32px; }
+    .interaction-switcher:not([hidden]) { position: absolute; inset-inline-start: 50%; transform: translateX(-50%); }
+  }
+`;
+viewer.shadowRoot.append(layout);
+
 const post = (type, payload = {}) => host.postMessage({ version: INTERFACE_VERSION, type, payload });
 const errorPayload = (error, fallback) => ({
   code: typeof error?.code === "string" ? error.code : fallback,
@@ -20,7 +29,12 @@ viewer.config = {
     ...(globalThis.docViewKitHostExecution === "inline" ? { execution: "inline" } : {}),
     formatPack: async () => extendedFormatPack,
   },
-  features: { hyperlinks: true },
+  features: {
+    print: false,
+    fullscreen: false,
+    interactionModeSwitcher: true,
+    hyperlinks: true,
+  },
 };
 
 globalThis.open = (target) => {

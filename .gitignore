@@ -6,6 +6,7 @@ dist/
 build/
 out/
 .gradle/
+.kotlin/
 .intellijPlatform/
 /vscode/viewer/
 /vscode/*.vsix
