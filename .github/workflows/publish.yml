@@ -1,6 +1,9 @@
 name: Publish
 
 on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish.yml]
   release:
     types: [published]
   workflow_dispatch:
@@ -21,7 +24,7 @@ on:
 
 jobs:
   build:
-    if: ${{ github.event_name == 'workflow_dispatch' || !github.event.release.prerelease }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && !github.event.release.prerelease) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
