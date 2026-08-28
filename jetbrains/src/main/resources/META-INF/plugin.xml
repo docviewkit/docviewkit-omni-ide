@@ -3,9 +3,27 @@
   <name>DocViewKit Omni</name>
   <vendor url="https://docviewkit.com">DocViewKit</vendor>
   <description><![CDATA[
-    Read-only, browser-local document preview powered by the pinned DocViewKit Viewer package.
-    Document bytes stay in the IDE and are never uploaded by the plugin.
+    <p>Open Office documents, PDFs, iWork files, OpenDocument files, and more directly in your JetBrains IDE. DocViewKit Omni is a fast, private, read-only document viewer powered by DocViewKit Viewer.</p>
+    <ul>
+      <li><b>Broad format support, free:</b> DOCX, XLSX, PPTX, PDF, RTF, CSV, OpenDocument, Apple Pages/Numbers/Keynote, legacy Office, WPS Office, XPS, and related formats.</li>
+      <li><b>Documents stay local:</b> parsing, rendering, and search run inside the IDE. The plugin does not upload documents or send file names and paths to a remote service.</li>
+      <li><b>No conversion server:</b> preview files without a document-conversion backend.</li>
+      <li><b>Fast and lightweight:</b> format components load on demand for faster startup and lower resource use.</li>
+      <li><b>Useful document tools:</b> navigate, zoom, search, select text, follow safe links, and switch interaction modes where supported.</li>
+      <li><b>Safe, read-only viewing:</b> active document content is not executed, and isolated resource failures do not unnecessarily hide the rest of the document.</li>
+      <li><b>IDE-native behavior:</b> files load through IntelliJ Platform APIs, refresh when changed, and follow the IDE theme and language.</li>
+    </ul>
+    <p><b>Supported formats:</b> DOCX, DOCM, DOTX, DOTM, DOC, RTF, WPS; XLSX, XLSM, XLTX, XLTM, XLS, CSV, ET; PPTX, PPTM, PPSX, PPSM, POTX, POTM, PPT, DPS; ODT, OTT, FODT, ODS, OTS, FODS, ODP, OTP, FODP; Pages, Numbers, Keynote; PDF, XPS, and OXPS.</p>
+    <p>The free Viewer includes every available format and retains DocViewKit branding.</p>
   ]]></description>
+  <change-notes><![CDATA[
+    <p><b>0.1.12</b></p>
+    <ul>
+      <li>Added official DocViewKit branding and Marketplace icons.</li>
+      <li>Expanded the Marketplace description with supported formats, privacy, performance, and viewing features.</li>
+      <li>Updated DocViewKit Viewer to 0.2.58.</li>
+    </ul>
+  ]]></change-notes>
   <depends>com.intellij.modules.platform</depends>
   <extensions defaultExtensionNs="com.intellij">
     <fileEditorProvider implementation="com.docviewkit.omni.DocViewKitFileEditorProvider"/>

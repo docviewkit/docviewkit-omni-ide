@@ -41,6 +41,14 @@ try {
   const jarRoot = join(temp, "jar");
   unpack(jar, jarRoot);
 
+  const vscodePackage = JSON.parse(await readFile(join(vscode, "extension/package.json"), "utf8"));
+  assert.equal(vscodePackage.icon, "assets/icon.png");
+  assert.deepEqual((await readFile(join(vscode, "extension/assets/icon.png"))).subarray(0, 8), Buffer.from("89504e470d0a1a0a", "hex"));
+  assert.deepEqual(
+    await readFile(join(jarRoot, "META-INF/pluginIcon.svg")),
+    await readFile(join(root, "assets/docviewkit-omni.svg")),
+  );
+
   const vscodeRoot = join(vscode, "extension/viewer");
   const jetbrainsRoot = join(jarRoot, "viewer");
   const vscodeManifest = JSON.parse(await readFile(join(vscodeRoot, "manifest.json"), "utf8"));

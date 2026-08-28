@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.docviewkit.omni"
-version = "0.1.11"
+version = "0.1.12"
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
@@ -35,6 +35,10 @@ tasks {
     processResources {
         dependsOn(prepareViewer)
         from("../build/viewer") { into("viewer") }
+        from("../assets/docviewkit-omni.svg") {
+            into("META-INF")
+            rename { "pluginIcon.svg" }
+        }
     }
     withType<JavaCompile> {
         sourceCompatibility = "21"

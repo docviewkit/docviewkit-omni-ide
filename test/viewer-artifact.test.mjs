@@ -19,8 +19,8 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
       interfaceVersion: 1,
       package: {
         name: "@docviewkit/viewer",
-        version: "0.2.56",
-        integrity: "sha512-qxoZIlL7C/YJSa39FIkKsDFzF+FHRUN9XOfgnDlU5irxpcrAy4MGffDhG7ivVtWsa8w1bRuNo2x33RNOOBiJnQ==",
+        version: "0.2.58",
+        integrity: "sha512-BfnGljMlbue5eXwljOjoqCXbAsI8/6LeV8VLKiK39qG7JCznGToBjEsam4Qb+0ecEsk9HewvYjduISpfzkh0vA==",
       },
       extensions: [
         "pptx", "pptm", "ppsx", "ppsm", "potx", "potm",

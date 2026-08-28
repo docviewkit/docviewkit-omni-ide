@@ -1,9 +1,19 @@
 {
   "name": "docviewkit-omni",
   "displayName": "DocViewKit Omni",
-  "description": "Private, browser-local, read-only document preview in VS Code.",
-  "version": "0.1.11",
+  "description": "Fast, private, local preview for Office, PDF, iWork, OpenDocument and more—without uploads or a conversion server.",
+  "version": "0.1.12",
   "publisher": "docviewkit",
+  "icon": "assets/icon.png",
+  "homepage": "https://docviewkit.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docviewkit/docviewkit-omni-ide.git"
+  },
+  "bugs": {
+    "url": "https://github.com/docviewkit/docviewkit-omni-ide/issues"
+  },
+  "keywords": ["office", "document", "viewer", "preview", "docx", "xlsx", "pptx", "pdf"],
   "license": "SEE LICENSE IN viewer/package/FREE_VIEWER_LICENSE.md",
   "engines": {
     "vscode": "^1.125.0"

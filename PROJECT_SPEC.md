@@ -5,9 +5,9 @@
 | 项目 | 内容 |
 | --- | --- |
 | 产品名称 | DocViewKit Omni |
-| 文档版本 | 1.7 |
+| 文档版本 | 1.8 |
 | 产品阶段 | 首发正式版规划 |
-| 文档状态 | 0.1.11 已实现 |
+| 文档状态 | 0.1.12 已实现 |
 | 更新日期 | 2026-08-28 |
 | 目标仓库 | `docviewkitOmniForIde` |
 | Web 项目 | 独立仓库、独立发布，本仓库仅消费其构建产物 |
@@ -154,7 +154,7 @@ docviewkitOmniForIde/
 
 插件构建必须固定产物版本和校验和。禁止引用 `latest`、运行时远程地址或未经校验的本地目录。
 
-首版冻结为 `@docviewkit/viewer@0.2.53`，0.1.6 双宿主统一升级为 `@docviewkit/viewer@0.2.54`，0.1.11 双宿主统一升级为 `@docviewkit/viewer@0.2.56`，宿主接口版本保持 `1`。npm lockfile 固定 registry integrity，构建产物 `manifest.json` 再记录每个 Viewer 文件的 SHA-256；VSIX 与 JetBrains ZIP 必须通过双包清单和逐文件哈希一致性测试。
+首版冻结为 `@docviewkit/viewer@0.2.53`，0.1.6 双宿主统一升级为 `@docviewkit/viewer@0.2.54`，0.1.11 双宿主统一升级为 `@docviewkit/viewer@0.2.56`，0.1.12 双宿主统一升级为 `@docviewkit/viewer@0.2.58`，宿主接口版本保持 `1`。npm lockfile 固定 registry integrity，构建产物 `manifest.json` 再记录每个 Viewer 文件的 SHA-256；VSIX 与 JetBrains ZIP 必须通过双包清单和逐文件哈希一致性测试。
 
 ### 8.2 最小宿主消息语义
 
@@ -379,3 +379,4 @@ Web 到宿主：
 | 2026-08-25 | 1.5 | 以真实 VS Code Webview 校准桌面工具栏为 32px 安全边距并增加裁切祖先回归 |
 | 2026-08-25 | 1.6 | 清除 VS Code Webview 默认页面内边距，按真实可视边界保证工具栏两侧对称 |
 | 2026-08-28 | 1.7 | 双宿主统一升级 Viewer 0.2.56，并增加 Marketplace 自动发布与单市场重试流程 |
+| 2026-08-28 | 1.8 | 双宿主统一升级 Viewer 0.2.58，补充统一品牌图标并按官网能力重写 Marketplace 简介 |
