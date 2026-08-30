@@ -17,11 +17,9 @@
     <p>The free Viewer includes every available format and retains DocViewKit branding.</p>
   ]]></description>
   <change-notes><![CDATA[
-    <p><b>0.1.12</b></p>
+    <p><b>0.1.13</b></p>
     <ul>
-      <li>Added official DocViewKit branding and Marketplace icons.</li>
-      <li>Expanded the Marketplace description with supported formats, privacy, performance, and viewing features.</li>
-      <li>Updated DocViewKit Viewer to 0.2.58.</li>
+      <li>Updated DocViewKit Viewer to 0.2.59.</li>
     </ul>
   ]]></change-notes>
   <depends>com.intellij.modules.platform</depends>

@@ -9,7 +9,12 @@ export async function run(_testsRoot, callback) {
     const document = vscode.Uri.joinPath(directory, "sample.csv");
     await vscode.workspace.fs.writeFile(document, new TextEncoder().encode("name,value\nalpha,42\n"));
     await vscode.commands.executeCommand("vscode.openWith", document, "docviewkitOmni.preview");
-    const tab = vscode.window.tabGroups.activeTabGroup.activeTab;
+    const deadline = Date.now() + 5_000;
+    let tab = vscode.window.tabGroups.activeTabGroup.activeTab;
+    while (!(tab?.input instanceof vscode.TabInputCustom) && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 25));
+      tab = vscode.window.tabGroups.activeTabGroup.activeTab;
+    }
     assert.ok(tab?.input instanceof vscode.TabInputCustom, "DocViewKit Omni did not open a custom editor tab");
     assert.equal(tab.input.viewType, "docviewkitOmni.preview");
     await vscode.commands.executeCommand("workbench.action.closeActiveEditor");

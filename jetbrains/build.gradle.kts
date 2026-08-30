@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.docviewkit.omni"
-version = "0.1.12"
+version = "0.1.13"
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
