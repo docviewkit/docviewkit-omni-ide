@@ -1,6 +1,6 @@
 {
   "name": "docviewkit-omni",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -17,7 +17,7 @@
     "verify": "npm test && npm run test:browser && npm run test:vscode-host && npm run build:vscode"
   },
   "dependencies": {
-    "@docviewkit/viewer": "0.2.59"
+    "@docviewkit/viewer": "0.2.60"
   },
   "devDependencies": {
     "@vscode/test-electron": "3.1.0",
