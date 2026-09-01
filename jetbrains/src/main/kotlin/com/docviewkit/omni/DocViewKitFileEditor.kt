@@ -3,6 +3,7 @@ package com.docviewkit.omni
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileEditor
@@ -21,10 +22,10 @@ import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefJSQuery
+import com.intellij.ui.jcef.utils.JBCefStreamResourceHandler
 import com.intellij.util.ui.JBUI
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
-import org.cef.callback.CefCallback
 import org.cef.handler.CefRequestHandlerAdapter
 import org.cef.handler.CefResourceHandler
 import org.cef.handler.CefResourceRequestHandler
@@ -168,8 +169,8 @@ private class DocViewKitFileEditor(
         private val resources: CefResourceRequestHandler = object : CefResourceRequestHandlerAdapter() {
             override fun getResourceHandler(browser: CefBrowser, frame: CefFrame, request: CefRequest): CefResourceHandler {
                 val uri = runCatching { URI(request.url) }.getOrNull()
-                if (uri?.scheme != "https" || uri.host != "docviewkit-omni.invalid") return BytesHandler(null, 403)
-                return BytesHandler(viewerResource(uri.path, documentBytes), 200)
+                if (uri?.scheme != "https" || uri.host != "docviewkit-omni.invalid") return BytesHandler(null, 403, this@DocViewKitFileEditor)
+                return BytesHandler(viewerResource(uri.path, documentBytes), 200, this@DocViewKitFileEditor)
             }
         }
 
@@ -207,37 +208,19 @@ private class DocViewKitFileEditor(
     }
 }
 
-private class BytesHandler(resource: ViewerResource?, requestedStatus: Int) : CefResourceHandler {
-    private val bytes = resource?.bytes ?: ByteArray(0)
-    private val mimeType = resource?.mimeType ?: "text/plain"
+private class BytesHandler(resource: ViewerResource?, requestedStatus: Int, parent: Disposable) :
+    JBCefStreamResourceHandler(
+        (resource?.bytes ?: ByteArray(0)).inputStream(),
+        resource?.mimeType ?: "text/plain",
+        parent,
+        mapOf("Cache-Control" to if (resource?.mimeType == "application/octet-stream") "no-store" else "public, max-age=31536000, immutable"),
+    ) {
     private val status = if (resource == null && requestedStatus == 200) 404 else requestedStatus
-    private var offset = 0
-
-    override fun processRequest(request: CefRequest, callback: CefCallback): Boolean {
-        callback.Continue()
-        return true
-    }
 
     override fun getResponseHeaders(response: CefResponse, responseLength: IntRef, redirectUrl: StringRef) {
+        super.getResponseHeaders(response, responseLength, redirectUrl)
         response.status = status
-        response.mimeType = mimeType
-        response.setHeaderByName("Cache-Control", if (mimeType == "application/octet-stream") "no-store" else "public, max-age=31536000, immutable", true)
-        responseLength.set(bytes.size)
     }
-
-    override fun readResponse(dataOut: ByteArray, bytesToRead: Int, bytesRead: IntRef, callback: CefCallback): Boolean {
-        val count = minOf(bytesToRead, bytes.size - offset)
-        if (count <= 0) {
-            bytesRead.set(0)
-            return false
-        }
-        bytes.copyInto(dataOut, 0, offset, offset + count)
-        offset += count
-        bytesRead.set(count)
-        return true
-    }
-
-    override fun cancel() {}
 }
 
 private fun jsonString(value: String): String = buildString {
