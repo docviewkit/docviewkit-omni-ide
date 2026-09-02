@@ -6,6 +6,7 @@ import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorPolicy
 import com.intellij.openapi.fileEditor.FileEditorProvider
@@ -104,7 +105,8 @@ private class DocViewKitFileEditor(
                 "worker-src 'self' blob:",
                 "connect-src 'self'",
             ).joinToString("; ")
-            val bootstrap = "globalThis.docViewKitHost={postMessage(message){${cefQuery.inject("JSON.stringify(message)")}}};"
+            val bootstrap = "globalThis.docViewKitHost={postMessage(message){${cefQuery.inject("JSON.stringify(message)")}}};" +
+                "globalThis.docViewKitInitial={theme:${jsonString(currentTheme())},locale:${jsonString(Locale.getDefault().toLanguageTag())},background:${jsonString(currentBackground())}};"
             cefBrowser.loadHTML(renderViewerHtml(template, csp, nonce, bootstrap, "$ORIGIN/host.js"), "$ORIGIN/")
 
             project.messageBus.connect(this).apply {
@@ -123,8 +125,6 @@ private class DocViewKitFileEditor(
     private fun handleMessage(message: String) {
         when (Regex("\\\"type\\\"\\s*:\\s*\\\"([a-z-]+)\\\"").find(message)?.groupValues?.get(1)) {
             "ready" -> {
-                sendTheme()
-                post("locale", "{\"locale\":${jsonString(Locale.getDefault().toLanguageTag())}}")
                 loadDocument("open")
             }
             "open-external" -> Regex("\\\"url\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"").find(message)
@@ -155,7 +155,10 @@ private class DocViewKitFileEditor(
         }
     }
 
-    private fun sendTheme() = post("theme", "{\"theme\":\"${if (JBColor.isBright()) "light" else "dark"}\"}")
+    private fun sendTheme() = post(
+        "theme",
+        "{\"theme\":${jsonString(currentTheme())},\"background\":${jsonString(currentBackground())}}",
+    )
 
     private fun post(type: String, payload: String = "{}") {
         browser?.cefBrowser?.executeJavaScript(
@@ -235,4 +238,10 @@ private fun jsonString(value: String): String = buildString {
         }
     }
     append('"')
+}
+
+private fun currentTheme(): String = if (JBColor.isBright()) "light" else "dark"
+
+private fun currentBackground(): String = EditorColorsManager.getInstance().globalScheme.defaultBackground.let {
+    "rgb(${it.red} ${it.green} ${it.blue})"
 }

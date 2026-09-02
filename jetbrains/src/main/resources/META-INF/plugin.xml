@@ -17,10 +17,10 @@
     <p>The free Viewer includes every available format and retains DocViewKit branding.</p>
   ]]></description>
   <change-notes><![CDATA[
-    <p><b>0.1.15</b></p>
+    <p><b>0.1.16</b></p>
     <ul>
-      <li>Updated DocViewKit Viewer to 0.2.61.</li>
-      <li>Use the IntelliJ Platform stream resource handler for Viewer resources.</li>
+      <li>Updated DocViewKit Viewer to 0.2.62.</li>
+      <li>Prevent a theme-color flash while opening documents.</li>
     </ul>
   ]]></change-notes>
   <depends>com.intellij.modules.platform</depends>

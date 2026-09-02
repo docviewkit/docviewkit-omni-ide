@@ -14,10 +14,10 @@ assert.ok(existsSync(chrome), `Chromium executable not found: ${chrome}`);
 
 const template = await readFile(join(root, "index.html"), "utf8");
 const html = template
-  .replace("<head>", "<head><style>@layer vscode-default { body { padding: 0 20px; } }</style>")
+  .replace("<head>", "<head><style>:root { --vscode-editor-background: #1e1e1e; } @layer vscode-default { body { padding: 0 20px; } }</style>")
   .replaceAll("{{CSP}}", "default-src 'none'; img-src 'self' blob: data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'")
   .replaceAll("{{NONCE}}", "")
-  .replaceAll("{{HOST_BOOTSTRAP}}", "globalThis.docViewKitHost={messages:[],postMessage(message){globalThis.docViewKitHost.messages.push(message)}};")
+  .replaceAll("{{HOST_BOOTSTRAP}}", "globalThis.docViewKitHost={messages:[],postMessage(message){globalThis.docViewKitHost.messages.push(message)}};globalThis.docViewKitInitial={theme:'dark',locale:'en',background:'var(--vscode-editor-background, #fff)'};")
   .replaceAll("{{HOST_SCRIPT}}", "/host.js");
 const mime = { ".js": "text/javascript", ".json": "application/json", ".wasm": "application/wasm", ".md": "text/plain", ".txt": "text/plain" };
 const server = createServer(async (request, response) => {
@@ -42,11 +42,24 @@ const address = server.address();
 const origin = `http://127.0.0.1:${address.port}`;
 const browser = await chromium.launch({ executablePath: chrome, headless: true });
 try {
-  const page = await browser.newPage({ viewport: { width: 935, height: 800 } });
+  const page = await browser.newPage({ viewport: { width: 935, height: 800 }, colorScheme: "light" });
   const requests = [];
   page.on("request", (request) => requests.push(request.url()));
   await page.goto(origin);
   await page.waitForFunction(() => globalThis.docViewKitHost.messages.some((message) => message.type === "ready"));
+  const firstFrame = await page.evaluate(() => {
+    const viewer = document.querySelector("docviewkit-viewer");
+    return {
+      theme: viewer.dataset.resolvedTheme,
+      bodyBackground: getComputedStyle(document.body).backgroundColor,
+      viewerBackground: getComputedStyle(viewer.shadowRoot.querySelector(".shell")).backgroundColor,
+    };
+  });
+  assert.deepEqual(firstFrame, {
+    theme: "dark",
+    bodyBackground: "rgb(30, 30, 30)",
+    viewerBackground: "rgb(30, 30, 30)",
+  }, "Viewer first frame must use the host theme and background before opening the document");
   await page.evaluate(({ name, bytes }) => window.postMessage({
     version: 1,
     type: "open",

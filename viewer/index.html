@@ -13,7 +13,14 @@
 </head>
 <body>
   <docviewkit-viewer></docviewkit-viewer>
-  <script nonce="{{NONCE}}">{{HOST_BOOTSTRAP}}</script>
+  <script nonce="{{NONCE}}">
+    {{HOST_BOOTSTRAP}}
+    const initial = globalThis.docViewKitInitial;
+    if (typeof initial?.background === "string") {
+      document.body.style.background = initial.background;
+      document.querySelector("docviewkit-viewer").style.setProperty("--dv-background", initial.background);
+    }
+  </script>
   <script nonce="{{NONCE}}" type="module" src="{{HOST_SCRIPT}}"></script>
 </body>
 </html>

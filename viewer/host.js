@@ -4,6 +4,7 @@ import { extendedFormatPack } from "./package/extended-formats.js";
 const INTERFACE_VERSION = 1;
 const viewer = document.querySelector("docviewkit-viewer");
 const host = globalThis.docViewKitHost;
+const initial = globalThis.docViewKitInitial;
 let generation = 0;
 
 if (!viewer || !host?.postMessage) throw new Error("DocViewKit Omni host bootstrap is unavailable");
@@ -25,6 +26,8 @@ const errorPayload = (error, fallback) => ({
 const safeName = (name) => String(name || "document").split(/[\\/]/u).pop().slice(0, 255) || "document";
 
 viewer.config = {
+  ...(initial?.theme === "dark" || initial?.theme === "light" ? { theme: initial.theme } : {}),
+  ...(typeof initial?.locale === "string" ? { locale: initial.locale } : {}),
   engine: {
     ...(globalThis.docViewKitHostExecution === "inline" ? { execution: "inline" } : {}),
     formatPack: async () => extendedFormatPack,
@@ -36,6 +39,12 @@ viewer.config = {
     hyperlinks: true,
   },
 };
+
+function applyBackground(value) {
+  if (typeof value !== "string") return;
+  document.body.style.background = value;
+  viewer.style.setProperty("--dv-background", value);
+}
 
 globalThis.open = (target) => {
   try {
@@ -91,6 +100,7 @@ addEventListener("message", ({ data }) => {
       break;
     case "theme":
       viewer.config = { ...viewer.config, theme: data.payload?.theme === "dark" ? "dark" : "light" };
+      applyBackground(data.payload?.background);
       break;
     case "locale":
       viewer.config = { ...viewer.config, locale: String(data.payload?.locale || "en") };

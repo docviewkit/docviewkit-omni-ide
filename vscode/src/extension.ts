@@ -33,7 +33,11 @@ class OmniEditorProvider implements vscode.CustomReadonlyEditorProvider<OmniDocu
     webview.options = { enableScripts: true, localResourceRoots: [viewerRoot] };
     const hostScript = webview.asWebviewUri(vscode.Uri.joinPath(viewerRoot, "host.js")).toString();
     // ponytail: VS Code Webviews reject cross-origin module Workers; remove when Viewer ships a Webview-safe worker entry.
-    const hostBootstrap = "globalThis.docViewKitHost = acquireVsCodeApi(); globalThis.docViewKitHostExecution = 'inline';";
+    const theme = () => vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark ||
+      vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.HighContrast ? "dark" : "light";
+    const background = "var(--vscode-editor-background, #fff)";
+    const initial = JSON.stringify({ theme: theme(), locale: vscode.env.language, background });
+    const hostBootstrap = `globalThis.docViewKitHost = acquireVsCodeApi(); globalThis.docViewKitHostExecution = 'inline'; globalThis.docViewKitInitial = ${initial};`;
     const html = renderWebview(
       new TextDecoder().decode(templateBytes),
       contentSecurityPolicy(webview.cspSource, nonce),
@@ -59,10 +63,7 @@ class OmniEditorProvider implements vscode.CustomReadonlyEditorProvider<OmniDocu
         }
       }
     };
-    const sendTheme = () => post("theme", {
-      theme: vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark ||
-        vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.HighContrast ? "dark" : "light",
-    });
+    const sendTheme = () => post("theme", { theme: theme(), background });
 
     const base = document.uri.with({ path: posix.dirname(document.uri.path) });
     const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(base, name));
@@ -77,8 +78,6 @@ class OmniEditorProvider implements vscode.CustomReadonlyEditorProvider<OmniDocu
         const event = message as { version?: number; type?: string; payload?: Record<string, unknown> };
         if (event.version !== INTERFACE_VERSION) return;
         if (event.type === "ready") {
-          await sendTheme();
-          await post("locale", { locale: vscode.env.language });
           await load("open");
         } else if (event.type === "open-external" && typeof event.payload?.url === "string") {
           const url = allowedExternalUrl(event.payload.url);
