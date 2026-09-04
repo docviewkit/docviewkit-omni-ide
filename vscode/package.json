@@ -2,7 +2,7 @@
   "name": "docviewkit-omni",
   "displayName": "DocViewKit Omni",
   "description": "Fast, private, local preview for Office, PDF, iWork, OpenDocument and more—without uploads or a conversion server.",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "publisher": "docviewkit",
   "icon": "assets/icon.png",
   "homepage": "https://docviewkit.com/",
