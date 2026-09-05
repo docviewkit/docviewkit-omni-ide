@@ -1,19 +1,45 @@
 {
   "name": "docviewkit-omni",
   "displayName": "DocViewKit Omni",
-  "description": "Fast, private, local preview for Office, PDF, iWork, OpenDocument and more—without uploads or a conversion server.",
-  "version": "0.1.17",
+  "description": "Preview Office, PDF, OpenDocument, and iWork files locally in VS Code—without uploads or a conversion server.",
+  "version": "0.1.18",
   "publisher": "docviewkit",
   "icon": "assets/icon.png",
   "homepage": "https://docviewkit.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/docviewkit/docviewkit-omni-ide.git"
+    "url": "https://github.com/docviewkit/docviewkit-omni-ide.git",
+    "directory": "vscode"
   },
   "bugs": {
     "url": "https://github.com/docviewkit/docviewkit-omni-ide/issues"
   },
-  "keywords": ["office", "document", "viewer", "preview", "docx", "xlsx", "pptx", "pdf"],
+  "keywords": [
+    "office viewer",
+    "document viewer",
+    "document preview",
+    "file preview",
+    "offline viewer",
+    "local viewer",
+    "docx viewer",
+    "xlsx viewer",
+    "pptx viewer",
+    "pdf viewer",
+    "word preview",
+    "excel preview",
+    "powerpoint preview",
+    "opendocument",
+    "iwork",
+    "pages",
+    "numbers",
+    "keynote",
+    "wps office",
+    "read only"
+  ],
+  "galleryBanner": {
+    "color": "#111827",
+    "theme": "dark"
+  },
   "license": "SEE LICENSE IN viewer/package/FREE_VIEWER_LICENSE.md",
   "engines": {
     "vscode": "^1.125.0"
@@ -39,7 +65,7 @@
   "scripts": {
     "compile": "tsc -p .",
     "test": "npm run compile && node --test test/*.test.mjs",
-    "package": "vsce package --no-dependencies --allow-missing-repository"
+    "package": "vsce package --no-dependencies --allow-missing-repository --baseImagesUrl https://raw.githubusercontent.com/docviewkit/docviewkit-omni-ide/HEAD/vscode"
   },
   "devDependencies": {
     "@types/node": "24.10.12",

@@ -3,23 +3,27 @@
   <name>DocViewKit Omni</name>
   <vendor url="https://docviewkit.com">DocViewKit</vendor>
   <description><![CDATA[
-    <p>Open Office documents, PDFs, iWork files, OpenDocument files, and more directly in your JetBrains IDE. DocViewKit Omni is a fast, private, read-only document viewer powered by DocViewKit Viewer.</p>
+    <p>Preview Office, PDF, OpenDocument, and iWork files without leaving your JetBrains IDE. Documents stay on your device or IDE-managed remote workspace—no uploads and no conversion server.</p>
+    <h2>Open a document</h2>
+    <p>Open a supported file normally. DocViewKit Omni renders it in a read-only editor with navigation, zoom, search, text selection, safe hyperlinks, and interaction modes where supported.</p>
+    <h2>Why DocViewKit Omni?</h2>
     <ul>
-      <li><b>Broad format support, free:</b> DOCX, XLSX, PPTX, PDF, RTF, CSV, OpenDocument, Apple Pages/Numbers/Keynote, legacy Office, WPS Office, XPS, and related formats.</li>
-      <li><b>Documents stay local:</b> parsing, rendering, and search run inside the IDE. The plugin does not upload documents or send file names and paths to a remote service.</li>
+      <li><b>Documents stay private:</b> parsing, rendering, and search run locally. The plugin does not upload documents or send file names and paths to a remote service.</li>
       <li><b>No conversion server:</b> preview files without a document-conversion backend.</li>
+      <li><b>Broad format support, free:</b> view modern and legacy Office, PDF, OpenDocument, Apple iWork, WPS Office, XPS, RTF, and CSV files.</li>
       <li><b>Fast and lightweight:</b> format components load on demand for faster startup and lower resource use.</li>
-      <li><b>Useful document tools:</b> navigate, zoom, search, select text, follow safe links, and switch interaction modes where supported.</li>
       <li><b>Safe, read-only viewing:</b> active document content is not executed, and isolated resource failures do not unnecessarily hide the rest of the document.</li>
       <li><b>IDE-native behavior:</b> files load through IntelliJ Platform APIs, refresh when changed, and follow the IDE theme and language.</li>
     </ul>
-    <p><b>Supported formats:</b> DOCX, DOCM, DOTX, DOTM, DOC, RTF, WPS; XLSX, XLSM, XLTX, XLTM, XLS, CSV, ET; PPTX, PPTM, PPSX, PPSM, POTX, POTM, PPT, DPS; ODT, OTT, FODT, ODS, OTS, FODS, ODP, OTP, FODP; Pages, Numbers, Keynote; PDF, XPS, and OXPS.</p>
-    <p>The free Viewer includes every available format and retains DocViewKit branding.</p>
+    <h2>Supported formats</h2>
+    <p>DOCX, DOCM, DOTX, DOTM, DOC, RTF, WPS; XLSX, XLSM, XLTX, XLTM, XLS, CSV, ET; PPTX, PPTM, PPSX, PPSM, POTX, POTM, PPT, DPS; ODT, OTT, FODT, ODS, OTS, FODS, ODP, OTP, FODP; Pages, Numbers, Keynote; PDF, XPS, and OXPS.</p>
+    <p>The free Viewer includes every available format and retains DocViewKit branding. DocViewKit Omni is powered by DocViewKit Viewer.</p>
   ]]></description>
   <change-notes><![CDATA[
-    <p><b>0.1.17</b></p>
+    <p><b>0.1.18</b></p>
     <ul>
-      <li>Updated DocViewKit Viewer to 0.2.63.</li>
+      <li>Updated DocViewKit Viewer to 0.2.65.</li>
+      <li>Improved Marketplace descriptions and format discovery.</li>
     </ul>
   ]]></change-notes>
   <depends>com.intellij.modules.platform</depends>

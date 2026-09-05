@@ -19,8 +19,8 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
       interfaceVersion: 1,
       package: {
         name: "@docviewkit/viewer",
-        version: "0.2.63",
-        integrity: "sha512-57kj0JhSN1MsCWlmrnAAStxYTvgwQS8meEj9w2Waxwoj4QZjxZB78oEfARbYovBVE4PjA/N9n3P0/FVcL0luKw==",
+        version: "0.2.65",
+        integrity: "sha512-ducs8QLeCRtgV8AUrlo7bbCsjRNLKQIsX7U+a48bh6b2pNp2tWMKHFIf0iRBIZBFa5W3uZ6AEZJLVsnX2Dl5Zw==",
       },
       extensions: [
         "pptx", "pptm", "ppsx", "ppsm", "potx", "potm",
@@ -46,4 +46,32 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
   } finally {
     await rm(output, { recursive: true, force: true });
   }
+});
+
+test("marketplace metadata leads with local document preview and searchable formats", async () => {
+  const vscode = JSON.parse(await readFile(new URL("../vscode/package.json", import.meta.url), "utf8"));
+  assert.match(vscode.description, /^Preview Office, PDF, OpenDocument, and iWork files locally/u);
+  assert.match(vscode.description, /without uploads or a conversion server/u);
+  for (const keyword of ["office viewer", "document preview", "docx viewer", "xlsx viewer", "pptx viewer", "pdf viewer"]) {
+    assert.ok(vscode.keywords.includes(keyword), `missing Marketplace keyword: ${keyword}`);
+  }
+  assert.equal(vscode.repository.directory, "vscode");
+  assert.match(vscode.scripts.package, /--baseImagesUrl https:\/\/raw\.githubusercontent\.com\/docviewkit\/docviewkit-omni-ide\/HEAD\/vscode/u);
+  const readme = await readFile(new URL("../vscode/README.md", import.meta.url), "utf8");
+  const screenshots = [...readme.matchAll(/!\[[^\]]+\]\((assets\/[^)]+\.png)\)/gu)].map((match) => match[1]);
+  assert.deepEqual(screenshots.sort(), [
+    "assets/marketplace-docx.png",
+    "assets/marketplace-pptx.png",
+    "assets/marketplace-preview.png",
+    "assets/marketplace-xlsx.png",
+  ]);
+  for (const screenshot of screenshots) {
+    const png = await readFile(new URL(`../vscode/${screenshot}`, import.meta.url));
+    assert.deepEqual(png.subarray(0, 8), Buffer.from("89504e470d0a1a0a", "hex"));
+    assert.ok(png.readUInt32BE(16) >= 1_000 && png.readUInt32BE(20) >= 600, `${screenshot} is too small`);
+  }
+
+  const jetbrains = await readFile(new URL("../jetbrains/src/main/resources/META-INF/plugin.xml", import.meta.url), "utf8");
+  assert.match(jetbrains, /<p>Preview Office, PDF, OpenDocument, and iWork files without leaving your JetBrains IDE\./u);
+  assert.match(jetbrains, /Documents stay on your device or IDE-managed remote workspace—no uploads and no conversion server\./u);
 });
