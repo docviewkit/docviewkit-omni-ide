@@ -26,7 +26,6 @@ const errorPayload = (error, fallback) => ({
 const safeName = (name) => String(name || "document").split(/[\\/]/u).pop().slice(0, 255) || "document";
 
 viewer.config = {
-  ...(initial?.theme === "dark" || initial?.theme === "light" ? { theme: initial.theme } : {}),
   ...(typeof initial?.locale === "string" ? { locale: initial.locale } : {}),
   engine: {
     ...(globalThis.docViewKitHostExecution === "inline" ? { execution: "inline" } : {}),
@@ -43,7 +42,6 @@ viewer.config = {
 function applyBackground(value) {
   if (typeof value !== "string") return;
   document.body.style.background = value;
-  viewer.style.setProperty("--dv-background", value);
 }
 
 globalThis.open = (target) => {
@@ -99,7 +97,7 @@ addEventListener("message", ({ data }) => {
       void open(data.payload);
       break;
     case "theme":
-      viewer.config = { ...viewer.config, theme: data.payload?.theme === "dark" ? "dark" : "light" };
+      viewer.setAttribute("theme", data.payload?.theme === "dark" ? "dark" : "light");
       applyBackground(data.payload?.background);
       break;
     case "locale":

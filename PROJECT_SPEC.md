@@ -5,10 +5,10 @@
 | 项目 | 内容 |
 | --- | --- |
 | 产品名称 | DocViewKit Omni |
-| 文档版本 | 1.14 |
+| 文档版本 | 1.16 |
 | 产品阶段 | 首发正式版规划 |
-| 文档状态 | 0.1.18 已实现 |
-| 更新日期 | 2026-09-05 |
+| 文档状态 | 0.1.19 已实现 |
+| 更新日期 | 2026-09-20 |
 | 目标仓库 | `docviewkitOmniForIde` |
 | Web 项目 | 独立仓库、独立发布，本仓库仅消费其构建产物 |
 
@@ -154,7 +154,7 @@ docviewkitOmniForIde/
 
 插件构建必须固定产物版本和校验和。禁止引用 `latest`、运行时远程地址或未经校验的本地目录。
 
-首版冻结为 `@docviewkit/viewer@0.2.53`，0.1.6 双宿主统一升级为 `@docviewkit/viewer@0.2.54`，0.1.11 双宿主统一升级为 `@docviewkit/viewer@0.2.56`，0.1.12 双宿主统一升级为 `@docviewkit/viewer@0.2.58`，0.1.13 双宿主统一升级为 `@docviewkit/viewer@0.2.59`，0.1.14 双宿主统一升级为 `@docviewkit/viewer@0.2.60`，0.1.15 双宿主统一升级为 `@docviewkit/viewer@0.2.61`，0.1.16 双宿主统一升级为 `@docviewkit/viewer@0.2.62`，0.1.17 双宿主统一升级为 `@docviewkit/viewer@0.2.63`，0.1.18 双宿主统一升级为 `@docviewkit/viewer@0.2.65`，宿主接口版本保持 `1`。npm lockfile 固定 registry integrity，构建产物 `manifest.json` 再记录每个 Viewer 文件的 SHA-256；VSIX 与 JetBrains ZIP 必须通过双包清单和逐文件哈希一致性测试。
+首版冻结为 `@docviewkit/viewer@0.2.53`，0.1.6 双宿主统一升级为 `@docviewkit/viewer@0.2.54`，0.1.11 双宿主统一升级为 `@docviewkit/viewer@0.2.56`，0.1.12 双宿主统一升级为 `@docviewkit/viewer@0.2.58`，0.1.13 双宿主统一升级为 `@docviewkit/viewer@0.2.59`，0.1.14 双宿主统一升级为 `@docviewkit/viewer@0.2.60`，0.1.15 双宿主统一升级为 `@docviewkit/viewer@0.2.61`，0.1.16 双宿主统一升级为 `@docviewkit/viewer@0.2.62`，0.1.17 双宿主统一升级为 `@docviewkit/viewer@0.2.63`，0.1.18 双宿主统一升级为 `@docviewkit/viewer@0.2.65`，0.1.19 双宿主统一升级为 `@docviewkit/viewer@0.2.69`，宿主接口版本保持 `1`。npm lockfile 固定 registry integrity，构建产物 `manifest.json` 再记录每个 Viewer 文件的 SHA-256；VSIX 与 JetBrains ZIP 必须通过双包清单和逐文件哈希一致性测试。
 
 ### 8.2 最小宿主消息语义
 
@@ -162,7 +162,7 @@ docviewkitOmniForIde/
 
 - `open`：传递待打开文件的受控资源引用或字节数据。
 - `reload`：源文件改变后重新载入。
-- `theme`：同步宿主主题令牌。
+- `theme`：同步宿主深浅主题，通过 Viewer 原生 `theme` 属性应用，不覆盖 Viewer 调色板；初始属性在组件加载前设置，宿主页面背景单独沿用 IDE 配置。
 - `locale`：设置界面语言。
 - `dispose`：释放当前文档和浏览器资源。
 
@@ -386,3 +386,5 @@ Web 到宿主：
 | 2026-09-02 | 1.12 | 双宿主统一升级 Viewer 0.2.62，并让首帧主题与宿主背景在文档加载前完成同步 |
 | 2026-09-04 | 1.13 | 双宿主统一升级 Viewer 0.2.63 |
 | 2026-09-05 | 1.14 | 双宿主统一升级 Viewer 0.2.65，并补充 Marketplace 多格式真实预览截图与搜索信息 |
+| 2026-09-10 | 1.15 | 当前工作区双宿主统一升级 Viewer 0.2.67；使用原生主题属性，移除 Viewer 背景色覆盖并保留首帧与 IDE 主题切换同步 |
+| 2026-09-20 | 1.16 | 0.1.19 双宿主统一升级 Viewer 0.2.69，补齐 Office 回退字体产物校验，复验 DOCX 字体加载并发布原生主题接入 |

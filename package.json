@@ -1,6 +1,6 @@
 {
   "name": "docviewkit-omni",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -9,7 +9,7 @@
   "scripts": {
     "build:viewer": "node scripts/build-viewer.mjs build/viewer",
     "build:vscode": "node scripts/build-viewer.mjs vscode/viewer && npm run compile --workspace vscode",
-    "test:browser": "npm run build:viewer && node test/viewer-browser.mjs",
+    "test:browser": "npm run build:viewer && node test/viewer-browser.mjs vscode && node test/viewer-browser.mjs jetbrains",
     "test:vscode-host": "npm run build:vscode && node vscode/test/run-integration.mjs",
     "test:packages": "node test/package-contract.mjs",
     "test": "node --test test/*.test.mjs && npm test --workspace vscode",
@@ -17,7 +17,7 @@
     "verify": "npm test && npm run test:browser && npm run test:vscode-host && npm run build:vscode"
   },
   "dependencies": {
-    "@docviewkit/viewer": "0.2.65"
+    "@docviewkit/viewer": "0.2.69"
   },
   "devDependencies": {
     "@vscode/test-electron": "3.1.0",

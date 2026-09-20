@@ -10,6 +10,8 @@ const chrome = process.env.DOCVIEWKIT_CHROME || "/Applications/Google Chrome.app
 const fixturePath = process.env.DOCVIEWKIT_TEST_FILE;
 const fixtureName = fixturePath ? basename(fixturePath) : "sample.csv";
 const fixtureBytes = fixturePath ? await readFile(fixturePath) : new TextEncoder().encode("name,value\nalpha,42\n");
+const adapter = process.argv[2] || "vscode";
+assert.ok(["vscode", "jetbrains"].includes(adapter));
 assert.ok(existsSync(chrome), `Chromium executable not found: ${chrome}`);
 
 const template = await readFile(join(root, "index.html"), "utf8");
@@ -17,7 +19,7 @@ const html = template
   .replace("<head>", "<head><style>:root { --vscode-editor-background: #1e1e1e; } @layer vscode-default { body { padding: 0 20px; } }</style>")
   .replaceAll("{{CSP}}", "default-src 'none'; img-src 'self' blob: data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'")
   .replaceAll("{{NONCE}}", "")
-  .replaceAll("{{HOST_BOOTSTRAP}}", "globalThis.docViewKitHost={messages:[],postMessage(message){globalThis.docViewKitHost.messages.push(message)}};globalThis.docViewKitInitial={theme:'dark',locale:'en',background:'var(--vscode-editor-background, #fff)'};")
+  .replaceAll("{{HOST_BOOTSTRAP}}", `globalThis.docViewKitHost={messages:[],postMessage(message){globalThis.docViewKitHost.messages.push(message)}};globalThis.docViewKitInitial={theme:'dark',locale:'en',background:${JSON.stringify(adapter === "vscode" ? "var(--vscode-editor-background, #fff)" : "rgb(30 30 30)")}};${adapter === "vscode" ? "globalThis.docViewKitHostExecution='inline';" : ""}`)
   .replaceAll("{{HOST_SCRIPT}}", "/host.js");
 const mime = { ".js": "text/javascript", ".json": "application/json", ".wasm": "application/wasm", ".md": "text/plain", ".txt": "text/plain" };
 const server = createServer(async (request, response) => {
@@ -25,6 +27,11 @@ const server = createServer(async (request, response) => {
     if (request.url === "/") {
       response.setHeader("Content-Type", "text/html");
       response.end(html);
+      return;
+    }
+    if (request.url === "/document") {
+      response.setHeader("Content-Type", "application/octet-stream");
+      response.end(fixtureBytes);
       return;
     }
     const path = normalize(join(root, new URL(request.url, "http://localhost").pathname));
@@ -44,8 +51,17 @@ const browser = await chromium.launch({ executablePath: chrome, headless: true }
 try {
   const page = await browser.newPage({ viewport: { width: 935, height: 800 }, colorScheme: "light" });
   const requests = [];
+  const errors = [];
   page.on("request", (request) => requests.push(request.url()));
+  page.on("response", (response) => {
+    if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`);
+  });
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error" || message.type() === "warning") errors.push(message.text());
+  });
   await page.goto(origin);
+  assert.equal(await page.title(), "DocViewKit Omni");
   await page.waitForFunction(() => globalThis.docViewKitHost.messages.some((message) => message.type === "ready"));
   const firstFrame = await page.evaluate(() => {
     const viewer = document.querySelector("docviewkit-viewer");
@@ -58,13 +74,13 @@ try {
   assert.deepEqual(firstFrame, {
     theme: "dark",
     bodyBackground: "rgb(30, 30, 30)",
-    viewerBackground: "rgb(30, 30, 30)",
-  }, "Viewer first frame must use the host theme and background before opening the document");
-  await page.evaluate(({ name, bytes }) => window.postMessage({
+    viewerBackground: "rgb(23, 25, 29)",
+  }, "Viewer first frame must use its native dark palette while the host page keeps the IDE background");
+  await page.evaluate(({ name, bytes, adapter }) => window.postMessage({
     version: 1,
     type: "open",
-    payload: { name, bytes: new Uint8Array(bytes).buffer },
-  }, "*"), { name: fixtureName, bytes: [...fixtureBytes] });
+    payload: adapter === "vscode" ? { name, bytes: new Uint8Array(bytes).buffer } : { name, url: `${location.origin}/document` },
+  }, "*"), { name: fixtureName, bytes: [...fixtureBytes], adapter });
   try {
     await page.waitForFunction(() => globalThis.docViewKitHost.messages.some((message) => message.type === "document-ready"), undefined, { timeout: 10_000 });
   } catch (error) {
@@ -149,6 +165,25 @@ try {
     interactionSwitcherHidden: false,
     interactionModes: ["object", "display", "text"],
   });
+  const canvasBeforeTheme = await page.locator("docviewkit-viewer canvas.surface").evaluate((canvas) => canvas.toDataURL());
+  const assertTheme = async (theme, background) => {
+    await page.waitForFunction((theme) => document.querySelector("docviewkit-viewer").state.theme === theme, theme, { timeout: 2_000 });
+    await page.locator("docviewkit-viewer .shell").evaluate((shell) => Promise.all(shell.getAnimations().map((animation) => animation.finished)));
+    assert.equal(await page.locator("docviewkit-viewer .shell").evaluate((shell) => getComputedStyle(shell).backgroundColor), background,
+      `${adapter}: Viewer must use its native ${theme} palette without a host background override`);
+    assert.equal(await page.locator("docviewkit-viewer canvas.surface").evaluate((canvas) => canvas.toDataURL()), canvasBeforeTheme,
+      "Changing the shell theme must preserve document pixels");
+  };
+  // A native Viewer choice must work, and the next IDE theme change must still take effect.
+  await page.locator('docviewkit-viewer [data-action="theme"]').click();
+  await assertTheme("light", "rgb(238, 240, 243)");
+  for (const theme of ["dark", "light", "dark"]) {
+    await page.evaluate((theme) => window.postMessage({
+      version: 1, type: "theme", payload: { theme, background: theme === "dark" ? "rgb(30 30 30)" : "rgb(255 255 255)" },
+    }, "*"), theme);
+    await assertTheme(theme, theme === "dark" ? "rgb(23, 25, 29)" : "rgb(238, 240, 243)");
+  }
+  await page.screenshot({ path: `/tmp/docviewkit-omni-${adapter}-dark.png` });
   for (const width of [721, 720]) {
     await page.setViewportSize({ width, height: 800 });
     await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
@@ -167,9 +202,10 @@ try {
     assert.deepEqual(compact, { overflow: 0, overlaps: false }, `Toolbar layout failed at ${width}px`);
   }
   assert.deepEqual([...new Set(requests.map((url) => new URL(url).origin))], [origin]);
+  assert.deepEqual(errors, [], "Viewer must not emit browser errors or warnings");
   await page.evaluate(() => window.postMessage({ version: 1, type: "dispose", payload: {} }, "*"));
   await page.waitForFunction(() => document.querySelector("docviewkit-viewer").state.status === "destroyed");
-  console.log(`Viewer browser smoke passed: ${fixtureName} rendered locally with no remote requests`);
+  console.log(`Viewer browser smoke passed (${adapter}): ${fixtureName}, native theme controls and IDE changes, unchanged document pixels, no browser errors or remote requests`);
 } finally {
   await browser.close();
   server.close();

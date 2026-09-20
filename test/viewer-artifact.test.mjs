@@ -19,8 +19,8 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
       interfaceVersion: 1,
       package: {
         name: "@docviewkit/viewer",
-        version: "0.2.65",
-        integrity: "sha512-ducs8QLeCRtgV8AUrlo7bbCsjRNLKQIsX7U+a48bh6b2pNp2tWMKHFIf0iRBIZBFa5W3uZ6AEZJLVsnX2Dl5Zw==",
+        version: "0.2.69",
+        integrity: "sha512-hhgs0sRi+924I2C+NywMRISqn+6DlR4rLQhTHeYTWTUEtcKGMK+RYlSspGf6CMZwbHvL2Nx2U7i8VWKmD3elYQ==",
       },
       extensions: [
         "pptx", "pptm", "ppsx", "ppsm", "potx", "potm",
@@ -39,6 +39,11 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
     assert.match(manifest.files["index.html"], /^[a-f0-9]{64}$/u);
     assert.match(manifest.files["package/viewer.js"], /^[a-f0-9]{64}$/u);
     assert.match(manifest.files["package/office-viewer-core.wasm"], /^[a-f0-9]{64}$/u);
+    for (const family of ["Carlito", "Caladea"]) {
+      for (const face of ["Regular", "Bold", "Italic", "BoldItalic"]) {
+        assert.match(manifest.files[`package/${family}-${face}.ttf`], /^[a-f0-9]{64}$/u);
+      }
+    }
     assert.match(await readFile(join(output, "package/FREE_VIEWER_LICENSE.md"), "utf8"), /DocViewKit Free Viewer License/u);
     const vscode = JSON.parse(await readFile(new URL("../vscode/package.json", import.meta.url), "utf8"));
     const selector = vscode.contributes.customEditors[0].selector[0].filenamePattern;

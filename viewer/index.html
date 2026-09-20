@@ -16,9 +16,11 @@
   <script nonce="{{NONCE}}">
     {{HOST_BOOTSTRAP}}
     const initial = globalThis.docViewKitInitial;
+    if (initial?.theme === "dark" || initial?.theme === "light") {
+      document.querySelector("docviewkit-viewer").setAttribute("theme", initial.theme);
+    }
     if (typeof initial?.background === "string") {
       document.body.style.background = initial.background;
-      document.querySelector("docviewkit-viewer").style.setProperty("--dv-background", initial.background);
     }
   </script>
   <script nonce="{{NONCE}}" type="module" src="{{HOST_SCRIPT}}"></script>

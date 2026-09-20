@@ -2,7 +2,7 @@
   "name": "docviewkit-omni",
   "displayName": "DocViewKit Omni",
   "description": "Preview Office, PDF, OpenDocument, and iWork files locally in VS Code—without uploads or a conversion server.",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "publisher": "docviewkit",
   "icon": "assets/icon.png",
   "homepage": "https://docviewkit.com/",

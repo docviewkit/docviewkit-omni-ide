@@ -20,10 +20,10 @@
     <p>The free Viewer includes every available format and retains DocViewKit branding. DocViewKit Omni is powered by DocViewKit Viewer.</p>
   ]]></description>
   <change-notes><![CDATA[
-    <p><b>0.1.18</b></p>
+    <p><b>0.1.19</b></p>
     <ul>
-      <li>Updated DocViewKit Viewer to 0.2.65.</li>
-      <li>Improved Marketplace descriptions and format discovery.</li>
+      <li>Updated DocViewKit Viewer to 0.2.69, including bundled Office fallback fonts.</li>
+      <li>Use native Viewer themes from the first frame and follow IDE theme changes without overriding document colors.</li>
     </ul>
   ]]></change-notes>
   <depends>com.intellij.modules.platform</depends>
