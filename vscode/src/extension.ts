@@ -30,8 +30,9 @@ class OmniEditorProvider implements vscode.CustomReadonlyEditorProvider<OmniDocu
     const templateBytes = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(viewerRoot, "index.html"));
     const nonce = randomBytes(18).toString("base64url");
     const webview = panel.webview;
-    webview.options = { enableScripts: true, localResourceRoots: [viewerRoot] };
-    const hostScript = webview.asWebviewUri(vscode.Uri.joinPath(viewerRoot, "host.js")).toString();
+    const adapterRoot = vscode.Uri.joinPath(this.context.extensionUri, "dist");
+    webview.options = { enableScripts: true, localResourceRoots: [viewerRoot, adapterRoot] };
+    const hostScript = webview.asWebviewUri(vscode.Uri.joinPath(adapterRoot, "viewer.js")).toString();
     // ponytail: VS Code Webviews reject cross-origin module Workers; remove when Viewer ships a Webview-safe worker entry.
     const theme = () => vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark ||
       vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.HighContrast ? "dark" : "light";

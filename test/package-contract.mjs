@@ -42,6 +42,8 @@ try {
   unpack(jar, jarRoot);
 
   const vscodePackage = JSON.parse(await readFile(join(vscode, "extension/package.json"), "utf8"));
+  assert.deepEqual(await readFile(join(vscode, "extension/dist/viewer.js")), await readFile(join(root, "vscode/dist/viewer.js")),
+    "VSIX must include the current Webview worker adapter");
   assert.equal(vscodePackage.icon, "assets/icon.png");
   assert.deepEqual((await readFile(join(vscode, "extension/assets/icon.png"))).subarray(0, 8), Buffer.from("89504e470d0a1a0a", "hex"));
   assert.deepEqual(

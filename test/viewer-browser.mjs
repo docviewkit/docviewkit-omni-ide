@@ -7,7 +7,8 @@ import { chromium } from "playwright-core";
 
 const root = new URL("../build/viewer/", import.meta.url).pathname;
 const chrome = process.env.DOCVIEWKIT_CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const fixturePath = process.env.DOCVIEWKIT_TEST_FILE;
+const fixturePath = process.env.DOCVIEWKIT_TEST_FILE || process.argv.slice(3).find((arg) => !arg.startsWith("--"));
+const missingWorker = process.argv.includes("--missing-image-worker");
 const fixtureName = fixturePath ? basename(fixturePath) : "sample.csv";
 const fixtureBytes = fixturePath ? await readFile(fixturePath) : new TextEncoder().encode("name,value\nalpha,42\n");
 const adapter = process.argv[2] || "vscode";
@@ -15,15 +16,17 @@ assert.ok(["vscode", "jetbrains"].includes(adapter));
 assert.ok(existsSync(chrome), `Chromium executable not found: ${chrome}`);
 
 const template = await readFile(join(root, "index.html"), "utf8");
-const html = template
+let html;
+const renderHtml = (origin, resourceOrigin) => template
   .replace("<head>", "<head><style>:root { --vscode-editor-background: #1e1e1e; } @layer vscode-default { body { padding: 0 20px; } }</style>")
-  .replaceAll("{{CSP}}", "default-src 'none'; img-src 'self' blob: data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'")
+  .replaceAll("{{CSP}}", `default-src 'none'; img-src ${resourceOrigin} blob: data:; font-src ${resourceOrigin} data:; style-src ${resourceOrigin} 'unsafe-inline'; script-src ${resourceOrigin} 'unsafe-inline' 'wasm-unsafe-eval'; worker-src ${resourceOrigin} blob:; connect-src ${origin} ${resourceOrigin}`)
   .replaceAll("{{NONCE}}", "")
   .replaceAll("{{HOST_BOOTSTRAP}}", `globalThis.docViewKitHost={messages:[],postMessage(message){globalThis.docViewKitHost.messages.push(message)}};globalThis.docViewKitInitial={theme:'dark',locale:'en',background:${JSON.stringify(adapter === "vscode" ? "var(--vscode-editor-background, #fff)" : "rgb(30 30 30)")}};${adapter === "vscode" ? "globalThis.docViewKitHostExecution='inline';" : ""}`)
-  .replaceAll("{{HOST_SCRIPT}}", "/host.js");
+  .replaceAll("{{HOST_SCRIPT}}", adapter === "vscode" ? `${resourceOrigin.replace("127", "%31%32%37")}/adapter/viewer.js` : `${origin}/host.js`);
 const mime = { ".js": "text/javascript", ".json": "application/json", ".wasm": "application/wasm", ".md": "text/plain", ".txt": "text/plain" };
-const server = createServer(async (request, response) => {
+const serve = async (request, response) => {
   try {
+    response.setHeader("Access-Control-Allow-Origin", origin);
     if (request.url === "/") {
       response.setHeader("Content-Type", "text/html");
       response.end(html);
@@ -34,7 +37,17 @@ const server = createServer(async (request, response) => {
       response.end(fixtureBytes);
       return;
     }
-    const path = normalize(join(root, new URL(request.url, "http://localhost").pathname));
+    const pathname = new URL(request.url, "http://localhost").pathname;
+    if (missingWorker && pathname.endsWith("/image-codec-worker.js")) {
+      response.writeHead(404).end();
+      return;
+    }
+    if (pathname === "/adapter/viewer.js") {
+      response.setHeader("Content-Type", "text/javascript");
+      response.end(await readFile(new URL("../vscode/dist/viewer.js", import.meta.url)));
+      return;
+    }
+    const path = normalize(join(root, pathname.replace(/^\/viewer\//u, "/")));
     if (!path.startsWith(root)) throw new Error("unsafe path");
     response.setHeader("Content-Type", mime[extname(path)] || "application/octet-stream");
     response.end(await readFile(path));
@@ -43,10 +56,15 @@ const server = createServer(async (request, response) => {
     response.statusCode = 404;
     response.end();
   }
-});
+};
+const server = createServer(serve);
+const resources = createServer(serve);
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 const address = server.address();
 const origin = `http://127.0.0.1:${address.port}`;
+await new Promise((resolve) => resources.listen(0, "127.0.0.1", resolve));
+const resourceOrigin = adapter === "vscode" ? `http://127.0.0.1:${resources.address().port}` : origin;
+html = renderHtml(origin, resourceOrigin);
 const browser = await chromium.launch({ executablePath: chrome, headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 935, height: 800 }, colorScheme: "light" });
@@ -145,6 +163,27 @@ try {
     assert.deepEqual(result.ready, { format: "csv", kind: "spreadsheet", unitCount: 1 });
   }
   assert.ok(result.renderedCanvases > 0, "Viewer did not render a document canvas");
+  if (fixtureName === "image-worker.pdf") {
+    // Flate RGB plus a soft mask matches receipt images; JPEG2000 also requires the codec's WASM.
+    const colors = await page.locator("docviewkit-viewer canvas.surface").first().evaluate((canvas) => {
+      const pixels = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
+      return [0.25, 0.75].flatMap((y) => [0.375, 0.625].map((x) => {
+        const offset = (Math.floor(canvas.height * y) * canvas.width + Math.floor(canvas.width * x)) * 4;
+        return [...pixels.slice(offset, offset + 4)];
+      }));
+    });
+    assert.deepEqual(colors, [[230, 25, 25, 255], [127, 217, 162, 255], [230, 25, 25, 255], [127, 217, 162, 255]],
+      "PDF images and their soft mask must render through the real image codec Worker");
+  }
+  const imageDiagnostics = await page.evaluate(() => globalThis.docViewKitHost.messages
+    .flatMap((message) => message.payload?.diagnostics || [])
+    .filter((diagnostic) => diagnostic.code.startsWith("IMAGE_") && diagnostic.fidelity === "not-rendered"));
+  assert.deepEqual(imageDiagnostics, [], "Image decode failures must not be hidden by document-ready");
+  if (missingWorker) {
+    assert.ok(await page.evaluate(() => globalThis.docViewKitHost.messages
+      .some((message) => message.payload?.diagnostics?.some((d) => d.code === "HOST_IMAGE_WORKER_FAILED"))),
+    "An unavailable codec must retain a diagnostic while CSV rendering remains usable");
+  }
   assert.equal(result.toolbarOverflow, 0, `Viewer toolbar overflows by ${result.toolbarOverflow}px`);
   assert.ok(result.toolbarAlignment.toolbarRightOverflow <= 0,
     `Viewer toolbar exceeds its clipping boundary by ${result.toolbarAlignment.toolbarRightOverflow}px`);
@@ -201,12 +240,18 @@ try {
     });
     assert.deepEqual(compact, { overflow: 0, overlaps: false }, `Toolbar layout failed at ${width}px`);
   }
-  assert.deepEqual([...new Set(requests.map((url) => new URL(url).origin))], [origin]);
-  assert.deepEqual(errors, [], "Viewer must not emit browser errors or warnings");
+  assert.deepEqual([...new Set(requests.map((url) => new URL(url).origin))].sort(), [...new Set([origin, resourceOrigin])].sort());
+  if (missingWorker) {
+    assert.ok(errors.length > 0 && errors.every((error) => error === `404 ${resourceOrigin}/viewer/package/image-codec-worker.js`
+      || error.startsWith("Failed to load resource: the server responded with a status of 404")), errors.join("\n"));
+  } else {
+    assert.deepEqual(errors, [], "Viewer must not emit browser errors or warnings");
+  }
   await page.evaluate(() => window.postMessage({ version: 1, type: "dispose", payload: {} }, "*"));
   await page.waitForFunction(() => document.querySelector("docviewkit-viewer").state.status === "destroyed");
-  console.log(`Viewer browser smoke passed (${adapter}): ${fixtureName}, native theme controls and IDE changes, unchanged document pixels, no browser errors or remote requests`);
+  console.log(`Viewer browser smoke passed (${adapter}): ${fixtureName}, native theme controls and IDE changes, unchanged document pixels, ${missingWorker ? "expected codec warning with usable preview" : "no browser errors or remote requests"}`);
 } finally {
   await browser.close();
   server.close();
+  resources.close();
 }

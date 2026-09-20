@@ -1,13 +1,16 @@
 import assert from "node:assert/strict";
 import * as vscode from "vscode";
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 
 export async function run(_testsRoot, callback) {
   const directory = vscode.Uri.joinPath(vscode.Uri.file(process.env.TMPDIR || "/tmp"), `docviewkit-omni-${Date.now()}`);
   let failure;
   try {
     await vscode.workspace.fs.createDirectory(directory);
-    const document = vscode.Uri.joinPath(directory, "sample.csv");
-    await vscode.workspace.fs.writeFile(document, new TextEncoder().encode("name,value\nalpha,42\n"));
+    await vscode.extensions.getExtension("docviewkit.docviewkit-omni").activate();
+    const document = vscode.Uri.joinPath(directory, "image-worker.pdf");
+    await vscode.workspace.fs.writeFile(document, await readFile(new URL("../../test/fixtures/image-worker.pdf", import.meta.url)));
     await vscode.commands.executeCommand("vscode.openWith", document, "docviewkitOmni.preview");
     const deadline = Date.now() + 5_000;
     let tab = vscode.window.tabGroups.activeTabGroup.activeTab;
@@ -17,6 +20,11 @@ export async function run(_testsRoot, callback) {
     }
     assert.ok(tab?.input instanceof vscode.TabInputCustom, "DocViewKit Omni did not open a custom editor tab");
     assert.equal(tab.input.viewType, "docviewkitOmni.preview");
+    const renderingDeadline = Date.now() + 60_000;
+    while (!existsSync(process.env.DOCVIEWKIT_TEST_DONE) && Date.now() < renderingDeadline) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    assert.ok(existsSync(process.env.DOCVIEWKIT_TEST_DONE), "Webview pixel verification timed out");
     await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
   } catch (error) {
     failure = error;
