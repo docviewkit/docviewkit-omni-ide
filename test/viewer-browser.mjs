@@ -163,7 +163,7 @@ try {
     assert.deepEqual(result.ready, { format: "csv", kind: "spreadsheet", unitCount: 1 });
   }
   assert.ok(result.renderedCanvases > 0, "Viewer did not render a document canvas");
-  if (fixtureName === "image-worker.pdf") {
+  if (["image-worker.pdf", "sample.ofd"].includes(fixtureName)) {
     // Flate RGB plus a soft mask matches receipt images; JPEG2000 also requires the codec's WASM.
     const colors = await page.locator("docviewkit-viewer canvas.surface").first().evaluate((canvas) => {
       const pixels = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
@@ -172,8 +172,10 @@ try {
         return [...pixels.slice(offset, offset + 4)];
       }));
     });
-    assert.deepEqual(colors, [[230, 25, 25, 255], [127, 217, 162, 255], [230, 25, 25, 255], [127, 217, 162, 255]],
-      "PDF images and their soft mask must render through the real image codec Worker");
+    const expected = fixtureName === "sample.ofd"
+      ? [[230, 25, 25, 255], [230, 25, 25, 255], [25, 180, 70, 255], [25, 180, 70, 255]]
+      : [[230, 25, 25, 255], [127, 217, 162, 255], [230, 25, 25, 255], [127, 217, 162, 255]];
+    assert.deepEqual(colors, expected, "The fixture content must render as expected");
   }
   const imageDiagnostics = await page.evaluate(() => globalThis.docViewKitHost.messages
     .flatMap((message) => message.payload?.diagnostics || [])

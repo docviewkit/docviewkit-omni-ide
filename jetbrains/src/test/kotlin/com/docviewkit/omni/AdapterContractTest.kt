@@ -33,6 +33,8 @@ class AdapterContractTest {
         assertTrue(isSupportedFileName("proposal.DOCX"))
         assertTrue(isSupportedFileName("slides.ppsm"))
         assertTrue(isSupportedFileName("sheet.et"))
+        assertTrue(isSupportedFileName("invoice.ofd"))
+        assertTrue(isSupportedFileName("invoice.OFD"))
         assertFalse(isSupportedFileName("notes.txt"))
         assertFalse(isSupportedFileName("no-extension"))
     }

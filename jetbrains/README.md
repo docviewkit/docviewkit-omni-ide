@@ -2,4 +2,10 @@
 
 The Kotlin adapter registers a `FileEditorProvider`, serves packaged Viewer resources and current document bytes from the private `https://docviewkit-omni.invalid` JCEF origin, reloads on VFS changes, and disposes the browser/query with the editor. If JCEF is unavailable it shows a native diagnostic and does not fall back to an image or remote service.
 
+## OFD preview
+
+Preview OFD 1.0 and 1.1 fixed-layout documents (`.ofd`) locally in a read-only editor, without uploading them or using a conversion server. Open an OFD file normally to view its document content and page layout. Rendering covers the supported subset of OFD; the plugin does not provide trusted digital-signature validation.
+
+## Build
+
 Build with `JAVA_HOME=/path/to/jdk-21 ./gradlew clean test buildPlugin verifyPluginStructure`.

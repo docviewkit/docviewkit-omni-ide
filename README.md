@@ -1,6 +1,6 @@
 # DocViewKit Omni
 
-DocViewKit Omni brings fast, private, read-only document preview to VS Code and JetBrains IDEs. Open Office, PDF, OpenDocument, iWork, and other supported files without uploading them or running a document-conversion server.
+DocViewKit Omni brings fast, private, read-only document preview to VS Code and JetBrains IDEs. Open Office, PDF, OFD, OpenDocument, iWork, and other supported files without uploading them or running a document-conversion server.
 
 - Every available format is included for free.
 - Documents are parsed, rendered, and searched locally inside the IDE.
@@ -9,9 +9,13 @@ DocViewKit Omni brings fast, private, read-only document preview to VS Code and 
 - Active document content is not executed, and isolated failures do not unnecessarily hide the rest of the document.
 - Local and IDE-managed remote workspaces use the host's own filesystem, permissions, theme, language, and lifecycle APIs.
 
-Supported families include modern and legacy Word, Excel, and PowerPoint; OpenDocument; Apple Pages, Numbers, and Keynote; WPS Office; PDF; XPS; RTF; and CSV. See the [VS Code Marketplace description](vscode/README.md) for the complete extension list.
+Supported families include modern and legacy Word, Excel, and PowerPoint; OpenDocument; Apple Pages, Numbers, and Keynote; WPS Office; PDF; OFD; XPS; RTF; and CSV. See the [VS Code Marketplace description](vscode/README.md) for the complete extension list.
 
 Both adapters pin the unmodified `@docviewkit/viewer@0.2.69` package as their only parser and renderer. The native Viewer theme is set before the component loads and follows IDE theme changes without overriding the Viewer's palette.
+
+## OFD preview
+
+Preview OFD 1.0 and 1.1 fixed-layout documents (`.ofd`) locally in a read-only editor, without uploading them or using a conversion server. Open an OFD file normally to view its document content and page layout. Rendering covers the supported subset of OFD; the plugin does not provide trusted digital-signature validation.
 
 ## Architecture
 
@@ -32,7 +36,7 @@ JAVA_HOME=/path/to/jdk-21 ./jetbrains/gradlew -p jetbrains clean test buildPlugi
 npm run test:packages
 ```
 
-The browser smoke requires Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`, or set `DOCVIEWKIT_CHROME`. Outputs are `vscode/docviewkit-omni-0.1.20.vsix` and `jetbrains/build/distributions/docviewkit-omni-0.1.20.zip`.
+The browser smoke requires Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`, or set `DOCVIEWKIT_CHROME`. Outputs are `vscode/docviewkit-omni-0.1.21.vsix` and `jetbrains/build/distributions/docviewkit-omni-0.1.21.zip`.
 
 Document bytes stay in the IDE/Webview/JCEF process. Runtime scripts, fonts, Wasm, and format packs come only from the packaged Viewer artifact; document links are handed to the host after protocol validation.
 

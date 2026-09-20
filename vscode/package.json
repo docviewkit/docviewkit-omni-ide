@@ -1,8 +1,8 @@
 {
   "name": "docviewkit-omni",
   "displayName": "DocViewKit Omni",
-  "description": "Preview Office, PDF, OpenDocument, and iWork files locally in VS Code—without uploads or a conversion server.",
-  "version": "0.1.20",
+  "description": "Preview Office, PDF, OFD, OpenDocument, and iWork files locally in VS Code—without uploads or a conversion server.",
+  "version": "0.1.21",
   "publisher": "docviewkit",
   "icon": "assets/icon.png",
   "homepage": "https://docviewkit.com/",
@@ -25,6 +25,7 @@
     "xlsx viewer",
     "pptx viewer",
     "pdf viewer",
+    "ofd viewer",
     "word preview",
     "excel preview",
     "powerpoint preview",
@@ -55,7 +56,7 @@
         "displayName": "DocViewKit Omni",
         "selector": [
           {
-            "filenamePattern": "*.{pptx,pptm,ppsx,ppsm,potx,potm,xlsx,xlsm,xltx,xltm,docx,docm,dotx,dotm,csv,rtf,odp,otp,fodp,ods,ots,fods,odt,ott,fodt,pages,numbers,key,doc,xls,ppt,wps,et,dps,pdf,xps,oxps}"
+            "filenamePattern": "*.{pptx,pptm,ppsx,ppsm,potx,potm,xlsx,xlsm,xltx,xltm,docx,docm,dotx,dotm,csv,rtf,odp,otp,fodp,ods,ots,fods,odt,ott,fodt,pages,numbers,key,doc,xls,ppt,wps,et,dps,pdf,xps,oxps,ofd}"
           }
         ],
         "priority": "default"

@@ -9,9 +9,11 @@ export async function run(_testsRoot, callback) {
   try {
     await vscode.workspace.fs.createDirectory(directory);
     await vscode.extensions.getExtension("docviewkit.docviewkit-omni").activate();
-    const document = vscode.Uri.joinPath(directory, "image-worker.pdf");
-    await vscode.workspace.fs.writeFile(document, await readFile(new URL("../../test/fixtures/image-worker.pdf", import.meta.url)));
-    await vscode.commands.executeCommand("vscode.openWith", document, "docviewkitOmni.preview");
+    const name = process.env.DOCVIEWKIT_TEST_FIXTURE || "image-worker.pdf";
+    const document = vscode.Uri.joinPath(directory, name);
+    await vscode.workspace.fs.writeFile(document, await readFile(new URL(`../../test/fixtures/${name}`, import.meta.url)));
+    if (name.endsWith(".ofd")) await vscode.commands.executeCommand("vscode.open", document);
+    else await vscode.commands.executeCommand("vscode.openWith", document, "docviewkitOmni.preview");
     const deadline = Date.now() + 5_000;
     let tab = vscode.window.tabGroups.activeTabGroup.activeTab;
     while (!(tab?.input instanceof vscode.TabInputCustom) && Date.now() < deadline) {

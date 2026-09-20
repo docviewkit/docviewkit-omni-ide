@@ -9,6 +9,6 @@
     "pages", "numbers", "key",
     "doc", "xls", "ppt",
     "wps", "et", "dps",
-    "pdf", "xps", "oxps"
+    "pdf", "xps", "oxps", "ofd"
   ]
 }

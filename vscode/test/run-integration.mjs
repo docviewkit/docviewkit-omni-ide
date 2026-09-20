@@ -5,6 +5,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { createServer } from "node:net";
 
+const fixture = process.argv[2] || process.env.DOCVIEWKIT_TEST_FIXTURE || "image-worker.pdf";
 const directory = await mkdtemp(resolve(tmpdir(), "omni-host-test-"));
 const done = resolve(directory, "done");
 const listener = createServer();
@@ -15,7 +16,7 @@ let launchError;
 const running = runTests({
   extensionDevelopmentPath: process.env.DOCVIEWKIT_TEST_EXTENSION || resolve("vscode"),
   extensionTestsPath: resolve("vscode/test/integration.mjs"),
-  extensionTestsEnv: { DOCVIEWKIT_TEST_DONE: done },
+  extensionTestsEnv: { DOCVIEWKIT_TEST_DONE: done, DOCVIEWKIT_TEST_FIXTURE: fixture },
   launchArgs: ["--disable-extensions", "--skip-welcome", "--skip-release-notes", `--remote-debugging-port=${port}`],
 }).catch((error) => { launchError = error; });
 const deadline = Date.now() + 60_000;
@@ -78,9 +79,11 @@ try {
       }));
     })()`,
   });
-  assert.deepEqual(result.result.value, [[230, 25, 25, 255], [127, 217, 162, 255], [230, 25, 25, 255], [127, 217, 162, 255]],
-    "Real VS Code must render Flate/JPEG2000 images and their soft masks");
-  console.log("Real VS Code image Worker, WASM resources, and alpha pixels passed");
+  const expected = fixture === "sample.ofd"
+    ? [[230, 25, 25, 255], [230, 25, 25, 255], [25, 180, 70, 255], [25, 180, 70, 255]]
+    : [[230, 25, 25, 255], [127, 217, 162, 255], [230, 25, 25, 255], [127, 217, 162, 255]];
+  assert.deepEqual(result.result.value, expected, "Real VS Code must render the fixture content");
+  console.log(`Real VS Code ${fixture} pixels passed`);
 } finally {
   socket?.close();
   await writeFile(done, "done");

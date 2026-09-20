@@ -1,6 +1,6 @@
 {
   "name": "docviewkit-omni",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -9,8 +9,8 @@
   "scripts": {
     "build:viewer": "node scripts/build-viewer.mjs build/viewer",
     "build:vscode": "node scripts/build-viewer.mjs vscode/viewer && npm run compile --workspace vscode",
-    "test:browser": "npm run build:viewer && npm run compile --workspace vscode && node test/viewer-browser.mjs vscode && node test/viewer-browser.mjs jetbrains && node test/viewer-browser.mjs vscode test/fixtures/image-worker.pdf && node test/viewer-browser.mjs jetbrains test/fixtures/image-worker.pdf && node test/viewer-browser.mjs vscode --missing-image-worker",
-    "test:vscode-host": "npm run build:vscode && node vscode/test/run-integration.mjs",
+    "test:browser": "npm run build:viewer && npm run compile --workspace vscode && node test/viewer-browser.mjs vscode && node test/viewer-browser.mjs jetbrains && node test/viewer-browser.mjs vscode test/fixtures/image-worker.pdf && node test/viewer-browser.mjs jetbrains test/fixtures/image-worker.pdf && node test/viewer-browser.mjs vscode --missing-image-worker && node test/viewer-browser.mjs vscode test/fixtures/sample.ofd && node test/viewer-browser.mjs jetbrains test/fixtures/sample.ofd",
+    "test:vscode-host": "npm run build:vscode && node vscode/test/run-integration.mjs && node vscode/test/run-integration.mjs sample.ofd",
     "test:packages": "node test/package-contract.mjs",
     "test": "node --test test/*.test.mjs && npm test --workspace vscode",
     "package:vscode": "npm run build:vscode && npm run package --workspace vscode",

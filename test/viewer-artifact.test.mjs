@@ -31,7 +31,7 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
         "pages", "numbers", "key",
         "doc", "xls", "ppt",
         "wps", "et", "dps",
-        "pdf", "xps", "oxps",
+        "pdf", "xps", "oxps", "ofd",
       ],
       files: manifest.files,
     });
@@ -55,9 +55,9 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
 
 test("marketplace metadata leads with local document preview and searchable formats", async () => {
   const vscode = JSON.parse(await readFile(new URL("../vscode/package.json", import.meta.url), "utf8"));
-  assert.match(vscode.description, /^Preview Office, PDF, OpenDocument, and iWork files locally/u);
+  assert.match(vscode.description, /^Preview Office, PDF, OFD, OpenDocument, and iWork files locally/u);
   assert.match(vscode.description, /without uploads or a conversion server/u);
-  for (const keyword of ["office viewer", "document preview", "docx viewer", "xlsx viewer", "pptx viewer", "pdf viewer"]) {
+  for (const keyword of ["office viewer", "document preview", "docx viewer", "xlsx viewer", "pptx viewer", "pdf viewer", "ofd viewer"]) {
     assert.ok(vscode.keywords.includes(keyword), `missing Marketplace keyword: ${keyword}`);
   }
   assert.equal(vscode.repository.directory, "vscode");
@@ -77,6 +77,15 @@ test("marketplace metadata leads with local document preview and searchable form
   }
 
   const jetbrains = await readFile(new URL("../jetbrains/src/main/resources/META-INF/plugin.xml", import.meta.url), "utf8");
-  assert.match(jetbrains, /<p>Preview Office, PDF, OpenDocument, and iWork files without leaving your JetBrains IDE\./u);
+  assert.match(jetbrains, /<p>Preview Office, PDF, OFD, OpenDocument, and iWork files without leaving your JetBrains IDE\./u);
   assert.match(jetbrains, /Documents stay on your device or IDE-managed remote workspace—no uploads and no conversion server\./u);
+});
+
+test("public READMEs and marketplace pages describe the current OFD boundary", async () => {
+  for (const path of ["README.md", "vscode/README.md", "jetbrains/README.md", "jetbrains/src/main/resources/META-INF/plugin.xml"]) {
+    const content = await readFile(new URL(`../${path}`, import.meta.url), "utf8");
+    assert.match(content, /OFD 1\.0 and 1\.1/u, `${path}: missing Core OFD capability`);
+    assert.match(content, /\.ofd/u, `${path}: missing file extension`);
+    assert.match(content, /does not provide trusted digital-signature validation/u, `${path}: missing signature boundary`);
+  }
 });
