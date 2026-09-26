@@ -22,10 +22,9 @@
     <p>The free Viewer includes every available format and retains DocViewKit branding. DocViewKit Omni is powered by DocViewKit Viewer.</p>
   ]]></description>
   <change-notes><![CDATA[
-    <p><b>0.1.21</b></p>
+    <p><b>0.1.22</b></p>
     <ul>
-      <li>Registered OFD files for local, read-only preview using the bundled Viewer.</li>
-      <li>Updated format descriptions with OFD 1.0 and 1.1 support and rendering boundaries.</li>
+      <li>Updated the bundled DocViewKit Viewer from 0.2.69 to 0.2.74.</li>
     </ul>
   ]]></change-notes>
   <depends>com.intellij.modules.platform</depends>
