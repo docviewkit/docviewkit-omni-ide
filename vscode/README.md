@@ -31,6 +31,6 @@ Word (`docx`, `docm`, `dotx`, `dotm`, `doc`, `rtf`, `wps`), Excel (`xlsx`, `xlsm
 
 Preview OFD 1.0 and 1.1 fixed-layout documents (`.ofd`) locally in a read-only editor, without uploading them or using a conversion server. Open an OFD file normally to view its document content and page layout. Rendering covers the supported subset of OFD; the plugin does not provide trusted digital-signature validation.
 
-The free Viewer includes every available format and retains DocViewKit branding. DocViewKit Omni is powered by [DocViewKit Viewer](https://docviewkit.com/).
+The bundled Viewer includes every available format and is licensed under Apache-2.0. DocViewKit Omni is powered by [DocViewKit Viewer](https://docviewkit.com/).
 
 [Privacy Policy](https://docviewkit.com/privacy/docviewkit-omni/) · [End User License Agreement](https://docviewkit.com/license/docviewkit-omni/) · [Report an issue](https://github.com/docviewkit/docviewkit-omni-ide/issues)

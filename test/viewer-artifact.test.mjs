@@ -19,8 +19,8 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
       interfaceVersion: 1,
       package: {
         name: "@docviewkit/viewer",
-        version: "0.2.74",
-        integrity: "sha512-ZXSmyYfJWmeWSREFie7OTTPsqxAbqpFRqrgS3/y6c8G3vuXUVR9VBYzeLkZv573O9xWblBf7sfF3YuWu2RNjdg==",
+        version: "0.2.77",
+        integrity: "sha512-nm09gzP9vD46esYJG6d1YEyeV9cuA7ITru0J2PAGOM4EyCrLBzsB9U6Dljo1DwUvzsOPuNL59FC7rj6QhQMUbA==",
       },
       extensions: [
         "pptx", "pptm", "ppsx", "ppsm", "potx", "potm",
@@ -44,7 +44,9 @@ test("builds one pinned, self-contained Viewer artifact for both adapters", asyn
         assert.match(manifest.files[`package/${family}-${face}.ttf`], /^[a-f0-9]{64}$/u);
       }
     }
-    assert.match(await readFile(join(output, "package/FREE_VIEWER_LICENSE.md"), "utf8"), /DocViewKit Free Viewer License/u);
+    assert.match(await readFile(join(output, "package/LICENSE"), "utf8"), /Apache License\s+Version 2\.0/u);
+    assert.match(await readFile(join(output, "package/NOTICE"), "utf8"), /DocViewKit/u);
+    assert.ok((await readFile(join(output, "package/THIRD_PARTY_NOTICES.md"), "utf8")).length > 0);
     const vscode = JSON.parse(await readFile(new URL("../vscode/package.json", import.meta.url), "utf8"));
     const selector = vscode.contributes.customEditors[0].selector[0].filenamePattern;
     assert.deepEqual(selector.slice(selector.indexOf("{") + 1, selector.indexOf("}")).split(","), manifest.extensions);

@@ -5,10 +5,10 @@
 | 项目 | 内容 |
 | --- | --- |
 | 产品名称 | DocViewKit Omni |
-| 文档版本 | 1.19 |
+| 文档版本 | 1.20 |
 | 产品阶段 | 首发正式版规划 |
-| 文档状态 | 0.1.22 已实现 |
-| 更新日期 | 2026-09-26 |
+| 文档状态 | 0.1.23 已实现 |
+| 更新日期 | 2026-10-12 |
 | 目标仓库 | `docviewkitOmniForIde` |
 | Web 项目 | 独立仓库、独立发布，本仓库仅消费其构建产物 |
 
@@ -154,7 +154,7 @@ docviewkitOmniForIde/
 
 插件构建必须固定产物版本和校验和。禁止引用 `latest`、运行时远程地址或未经校验的本地目录。
 
-首版冻结为 `@docviewkit/viewer@0.2.53`，0.1.6 双宿主统一升级为 `@docviewkit/viewer@0.2.54`，0.1.11 双宿主统一升级为 `@docviewkit/viewer@0.2.56`，0.1.12 双宿主统一升级为 `@docviewkit/viewer@0.2.58`，0.1.13 双宿主统一升级为 `@docviewkit/viewer@0.2.59`，0.1.14 双宿主统一升级为 `@docviewkit/viewer@0.2.60`，0.1.15 双宿主统一升级为 `@docviewkit/viewer@0.2.61`，0.1.16 双宿主统一升级为 `@docviewkit/viewer@0.2.62`，0.1.17 双宿主统一升级为 `@docviewkit/viewer@0.2.63`，0.1.18 双宿主统一升级为 `@docviewkit/viewer@0.2.65`，0.1.19 双宿主统一升级为 `@docviewkit/viewer@0.2.69`，0.1.22 双宿主统一升级为 `@docviewkit/viewer@0.2.74`，宿主接口版本保持 `1`。npm lockfile 固定 registry integrity，构建产物 `manifest.json` 再记录每个 Viewer 文件的 SHA-256；VSIX 与 JetBrains ZIP 必须通过双包清单和逐文件哈希一致性测试。
+首版冻结为 `@docviewkit/viewer@0.2.53`，0.1.6 双宿主统一升级为 `@docviewkit/viewer@0.2.54`，0.1.11 双宿主统一升级为 `@docviewkit/viewer@0.2.56`，0.1.12 双宿主统一升级为 `@docviewkit/viewer@0.2.58`，0.1.13 双宿主统一升级为 `@docviewkit/viewer@0.2.59`，0.1.14 双宿主统一升级为 `@docviewkit/viewer@0.2.60`，0.1.15 双宿主统一升级为 `@docviewkit/viewer@0.2.61`，0.1.16 双宿主统一升级为 `@docviewkit/viewer@0.2.62`，0.1.17 双宿主统一升级为 `@docviewkit/viewer@0.2.63`，0.1.18 双宿主统一升级为 `@docviewkit/viewer@0.2.65`，0.1.19 双宿主统一升级为 `@docviewkit/viewer@0.2.69`，0.1.22 双宿主统一升级为 `@docviewkit/viewer@0.2.74`，0.1.23 双宿主统一升级为 `@docviewkit/viewer@0.2.77`，宿主接口版本保持 `1`。npm lockfile 固定 registry integrity，构建产物 `manifest.json` 再记录每个 Viewer 文件的 SHA-256；VSIX 与 JetBrains ZIP 必须通过双包清单和逐文件哈希一致性测试。
 
 ### 8.2 最小宿主消息语义
 
@@ -364,7 +364,7 @@ Web 到宿主：
 
 以下事项不阻塞项目目录和 adapter 骨架，但必须在对应里程碑前确定：
 
-1. Marketplace 商业模式与 IDE 离线商业许可模型；首版保留 Viewer 原有未授权/Free 品牌行为。
+1. Marketplace 商业模式；0.1.23 起集成 Apache-2.0 Viewer，保留其 LICENSE、NOTICE 与第三方许可证声明。
 2. 是否在首发后认证 PyCharm、WebStorm、GoLand、CLion、Rider 和 Android Studio。
 
 ## 19. 变更记录
@@ -391,3 +391,4 @@ Web 到宿主：
 | 2026-09-20 | 1.17 | 0.1.20 修复 VS Code 图片解码 Worker 与本地 Wasm 资源加载，补充真实宿主图片像素回归；Core 保持 0.2.69，仅发布 VS Code 市场 |
 | 2026-09-20 | 1.18 | 0.1.21 双宿主注册 OFD，同步 README 与市场简介，增加格式注册和实际渲染回归 |
 | 2026-09-26 | 1.19 | 0.1.22 双宿主统一升级 Viewer 0.2.74，更新固定版本与产物完整性校验 |
+| 2026-10-12 | 1.20 | 0.1.23 双宿主统一升级 Viewer 0.2.77，同步 Apache-2.0 核心许可说明与产物完整性校验 |
