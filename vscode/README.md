@@ -14,6 +14,12 @@ Open a supported file normally. If another editor is selected, use **Open With�
 
 DocViewKit Omni renders the document in a read-only editor with navigation, zoom, search, text selection, safe hyperlinks, and interaction modes where supported.
 
+## Install
+
+Search for `docviewkit.docviewkit-omni` in Visual Studio Marketplace or Open VSX. Releases distribute the same VSIX to both markets.
+
+For offline installation, download the `.vsix` and `.vsix.sha256` files from the matching [GitHub Release](https://github.com/docviewkit/docviewkit-omni-ide/releases), verify the SHA-256 checksum, then choose **Extensions → Install from VSIX…**. Compatibility with other VS Code-compatible editors depends on their extension API and Webview support.
+
 ## Why DocViewKit Omni?
 
 - **Documents stay private:** parsing, rendering, and search run locally. The extension does not upload documents or send file names and paths to a remote service.

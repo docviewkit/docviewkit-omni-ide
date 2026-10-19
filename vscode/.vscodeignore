@@ -4,3 +4,4 @@ tsconfig.json
 README.md
 assets/marketplace-*.png
 *.vsix
+*.vsix.sha256

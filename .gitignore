@@ -10,3 +10,4 @@ out/
 .intellijPlatform/
 /vscode/viewer/
 /vscode/*.vsix
+/vscode/*.vsix.sha256

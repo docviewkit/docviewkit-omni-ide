@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing vX.Y.Z tag to publish
+        description: Existing GitHub Release vX.Y.Z tag to publish
         required: true
         type: string
       target:
@@ -20,7 +20,17 @@ on:
         options:
           - all
           - vscode
+          - vs-marketplace
+          - openvsx
+          - vsix
           - jetbrains
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ inputs.tag || github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -56,23 +66,32 @@ jobs:
       - run: npm run package:vscode
       - run: ./jetbrains/gradlew -p jetbrains clean test buildPlugin verifyPluginStructure verifyPlugin
       - run: npm run test:packages
+      - name: Checksum VSIX
+        env:
+          TAG: ${{ inputs.tag || github.event.release.tag_name }}
+        run: |
+          cd vscode
+          sha256sum "docviewkit-omni-${TAG#v}.vsix" > "docviewkit-omni-${TAG#v}.vsix.sha256"
       - uses: actions/upload-artifact@v4
         with:
           name: marketplace-packages
           path: |
             vscode/*.vsix
+            vscode/*.vsix.sha256
             jetbrains/build/distributions/*.zip
           if-no-files-found: error
 
   vscode:
-    needs: build
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'vscode' }}
+    needs: vsix
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'vscode' || inputs.target == 'vs-marketplace' }}
     runs-on: ubuntu-latest
     environment: marketplace
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.event.release.tag_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -80,13 +99,77 @@ jobs:
       - run: npm ci
       - uses: actions/download-artifact@v4
         with:
-          name: marketplace-packages
-          path: marketplace-packages
+          name: vscode-release-package
+          path: marketplace-packages/vscode
       - name: Publish VS Code extension
         env:
           TAG: ${{ inputs.tag || github.event.release.tag_name }}
           VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-        run: npx vsce publish --packagePath "marketplace-packages/vscode/docviewkit-omni-${TAG#v}.vsix" --skip-duplicate
+        run: |
+          cd marketplace-packages/vscode
+          sha256sum -c "docviewkit-omni-${TAG#v}.vsix.sha256"
+          npx --no-install vsce publish --packagePath "docviewkit-omni-${TAG#v}.vsix" --skip-duplicate
+
+  openvsx:
+    needs: vsix
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'vscode' || inputs.target == 'openvsx' }}
+    runs-on: ubuntu-latest
+    environment: marketplace
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.event.release.tag_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: vscode-release-package
+          path: marketplace-packages/vscode
+      - name: Publish Open VSX extension
+        env:
+          TAG: ${{ inputs.tag || github.event.release.tag_name }}
+          OVSX_PAT: ${{ secrets.OPEN_VSX_TOKEN }}
+        run: |
+          cd marketplace-packages/vscode
+          sha256sum -c "docviewkit-omni-${TAG#v}.vsix.sha256"
+          npx --no-install ovsx publish "docviewkit-omni-${TAG#v}.vsix" --skip-duplicate
+
+  vsix:
+    needs: build
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'vscode' || inputs.target == 'vs-marketplace' || inputs.target == 'openvsx' || inputs.target == 'vsix' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: marketplace-packages
+          path: marketplace-packages
+      - name: Publish VSIX release assets
+        env:
+          TAG: ${{ inputs.tag || github.event.release.tag_name }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cd marketplace-packages/vscode
+          file="docviewkit-omni-${TAG#v}.vsix"
+          sha256sum -c "$file.sha256"
+          assets=$(gh release view "$TAG" --json assets --jq '.assets[].name')
+          if printf '%s\n' "$assets" | grep -Fxq "$file"; then
+            rm -- "$file" "$file.sha256"
+            gh release download "$TAG" --pattern "$file" --pattern "$file.sha256" --clobber
+            sha256sum -c "$file.sha256"
+          else
+            gh release upload "$TAG" "$file" "$file.sha256"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vscode-release-package
+          path: marketplace-packages/vscode/*
+          if-no-files-found: error
 
   jetbrains:
     needs: build
@@ -95,6 +178,8 @@ jobs:
     environment: marketplace
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.event.release.tag_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22

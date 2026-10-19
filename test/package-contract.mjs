@@ -42,6 +42,8 @@ try {
   unpack(jar, jarRoot);
 
   const vscodePackage = JSON.parse(await readFile(join(vscode, "extension/package.json"), "utf8"));
+  assert.ok(!(await readdir(join(vscode, "extension"))).some(name => name.endsWith(".vsix.sha256")),
+    "VSIX must not contain checksums left over from an earlier package build");
   assert.deepEqual(await readFile(join(vscode, "extension/dist/viewer.js")), await readFile(join(root, "vscode/dist/viewer.js")),
     "VSIX must include the current Webview worker adapter");
   assert.equal(vscodePackage.icon, "assets/icon.png");
