@@ -22,9 +22,9 @@
     <p>The bundled Viewer includes every available format and is licensed under Apache-2.0. DocViewKit Omni is powered by DocViewKit Viewer.</p>
   ]]></description>
   <change-notes><![CDATA[
-    <p><b>0.1.23</b></p>
+    <p><b>0.1.24</b></p>
     <ul>
-      <li>Updated the bundled DocViewKit Viewer from 0.2.74 to 0.2.77.</li>
+      <li>Updated the bundled DocViewKit Viewer from 0.2.77 to 0.2.79.</li>
     </ul>
   ]]></change-notes>
   <depends>com.intellij.modules.platform</depends>
