@@ -91,3 +91,29 @@ test("public READMEs and marketplace pages describe the current OFD boundary", a
     assert.match(content, /does not provide trusted digital-signature validation/u, `${path}: missing signature boundary`);
   }
 });
+
+test("product introductions cover every registered format and the complete reading workflow", async () => {
+  const { extensions } = JSON.parse(await readFile(new URL("../viewer/contract.json", import.meta.url), "utf8"));
+  for (const path of ["README.md", "vscode/README.md", "jetbrains/README.md", "jetbrains/src/main/resources/META-INF/plugin.xml"]) {
+    const content = await readFile(new URL(`../${path}`, import.meta.url), "utf8");
+    for (const heading of ["What you can preview", "Reading tools", "Privacy and workspaces", "Compatibility and limits", "Installation and requirements", "Troubleshooting"]) {
+      assert.ok(content.includes(heading), `${path}: missing product information: ${heading}`);
+    }
+    for (const extension of extensions) {
+      assert.ok(content.includes(`\`${extension}\``) || content.includes(`<code>${extension}</code>`), `${path}: missing registered format ${extension}`);
+    }
+    assert.match(content, /read-only/u, `${path}: missing product boundary`);
+    assert.match(content, /navigation/iu);
+    assert.match(content, /zoom/iu);
+    assert.match(content, /search/iu);
+    assert.match(content, /text selection/iu);
+    assert.match(content, /external links/iu);
+    assert.match(content, /remote workspace/iu);
+  }
+  const vscode = await readFile(new URL("../vscode/README.md", import.meta.url), "utf8");
+  assert.ok(vscode.includes("1.125.0"), "VS Code installation must state the required API version");
+  assert.match(vscode, /Output.*DocViewKit Omni/u, "Readers need the actual VS Code diagnostic location");
+  const jetbrains = await readFile(new URL("../jetbrains/src/main/resources/META-INF/plugin.xml", import.meta.url), "utf8");
+  assert.match(jetbrains, /2025\.2/u);
+  assert.match(jetbrains, /JCEF/u);
+});

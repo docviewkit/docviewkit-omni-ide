@@ -1,21 +1,65 @@
 # DocViewKit Omni
 
-DocViewKit Omni brings fast, private, read-only document preview to VS Code and JetBrains IDEs. Open Office, PDF, OFD, OpenDocument, iWork, and other supported files without uploading them or running a document-conversion server.
+DocViewKit Omni is a read-only document previewer for developers and technical teams. Read specifications, spreadsheets, presentations, reports, and reference documents alongside your code. The bundled DocViewKit Viewer parses and renders supported documents inside the IDE; no Office installation, document upload, account sign-in, or conversion server is required to preview files. Every available format is included for free.
 
-- Every available format is included for free.
-- Documents are parsed, rendered, and searched locally inside the IDE.
-- Format components load on demand for fast startup and lower resource use.
-- Navigation, zoom, search, text selection, safe hyperlinks, and interaction modes are built in where supported.
-- Active document content is not executed, and isolated failures do not unnecessarily hide the rest of the document.
-- Local and IDE-managed remote workspaces use the host's own filesystem, permissions, theme, language, and lifecycle APIs.
+## What you can preview
 
-Supported families include modern and legacy Word, Excel, and PowerPoint; OpenDocument; Apple Pages, Numbers, and Keynote; WPS Office; PDF; OFD; XPS; RTF; and CSV. See the [VS Code Marketplace description](vscode/README.md) for the complete extension list.
+| Document family | File extensions |
+| --- | --- |
+| Word and rich text | `docx`, `docm`, `dotx`, `dotm`, `doc`, `rtf` |
+| Excel and tabular data | `xlsx`, `xlsm`, `xltx`, `xltm`, `xls`, `csv` |
+| PowerPoint | `pptx`, `pptm`, `ppsx`, `ppsm`, `potx`, `potm`, `ppt` |
+| OpenDocument text | `odt`, `ott`, `fodt` |
+| OpenDocument spreadsheets | `ods`, `ots`, `fods` |
+| OpenDocument presentations | `odp`, `otp`, `fodp` |
+| Apple iWork | `pages`, `numbers`, `key` |
+| WPS Office | `wps`, `et`, `dps` |
+| Fixed-layout documents | `pdf`, `ofd`, `xps`, `oxps` |
 
-Both adapters pin the unmodified `@docviewkit/viewer@0.2.79` package as their only parser and renderer. The native Viewer theme is set before the component loads and follows IDE theme changes without overriding the Viewer's palette.
+Rendering depth varies by format and document.
 
-## OFD preview
+## Reading tools
+
+- **Navigation:** browse document pages, presentation slides, and workbook sheets; use thumbnails where the format supports them.
+- **Zoom:** inspect small text, tables, diagrams, and other document details at a comfortable scale.
+- **Search:** find document text and navigate to matching content where supported.
+- **Text selection:** select and copy readable text where supported by the format and interaction mode.
+- **Interaction modes and external links:** switch between available reading interactions; validated external links open through the IDE's normal handler.
+- **IDE integration:** previews follow IDE theme changes and use the IDE language where a matching Viewer translation is available. Files refresh when the host reports a change, and preview resources are released when the editor closes.
+
+## Privacy and workspaces
+
+Parsing, rendering, and search run inside the IDE's preview environment. The plugin does not upload document contents or send file names and paths to a remote service. Runtime scripts, fonts, Wasm, and format components are bundled with the extension; format components load on demand without downloading remote executable code.
+
+Files are read through the IDE's filesystem and permission APIs. In an IDE-managed remote workspace, file access follows that host's connection and permissions. Document bytes are passed to the preview environment, so a remote workspace does not imply that all processing stays on the remote machine. Opening an external link uses the IDE's usual external application or browser and can contact that destination.
+
+## Compatibility and limits
+
+DocViewKit Omni is read-only. Document editing, annotations, and format conversion are outside its scope. Macros and active document content are not executed. Print and fullscreen controls are disabled in the IDE integration.
+
+Layout, fonts, complex objects, and embedded resources depend on the format and bundled Viewer version. Complex or older documents, including some legacy iWork variants, may be incomplete or unsupported. Isolated object or resource failures are handled on a best-effort basis so usable content can remain visible. Preview support does not guarantee that every feature of the original authoring application is reproduced.
+
+### OFD preview
 
 Preview OFD 1.0 and 1.1 fixed-layout documents (`.ofd`) locally in a read-only editor, without uploading them or using a conversion server. Open an OFD file normally to view its document content and page layout. Rendering covers the supported subset of OFD; the plugin does not provide trusted digital-signature validation.
+
+## Installation and requirements
+
+- **VS Code:** desktop VS Code 1.125.0 or newer, with Webview support. Install `docviewkit.docviewkit-omni` from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=docviewkit.docviewkit-omni) or [Open VSX](https://open-vsx.org/extension/docviewkit/docviewkit-omni).
+- **Offline VS Code:** download the VSIX and SHA-256 file from [GitHub Releases](https://github.com/docviewkit/docviewkit-omni-ide/releases), verify the checksum, then choose **Install from VSIX…**.
+- **JetBrains:** a compatible IntelliJ Platform 2025.2+ IDE (build 252+) using its bundled JetBrains Runtime with JCEF. Install from **Settings → Plugins → Marketplace**, or install an available plugin ZIP from disk. JCEF unavailability produces a diagnostic.
+
+Open a supported file normally. In VS Code, use **Open With… → DocViewKit Omni** if another editor is selected. Supported local files can be previewed offline after installation; extension installation and updates use the host's distribution service. Other VS Code-compatible editors and remote workspace configurations need their own host compatibility validation.
+
+## Troubleshooting
+
+Check the file extension, required IDE version, and selected file editor first. VS Code diagnostics appear in **View → Output → DocViewKit Omni**; JetBrains diagnostics appear in the IDE log. Report the plugin version, IDE version, format, and steps to reproduce in an [issue](https://github.com/docviewkit/docviewkit-omni-ide/issues). Remove private paths or document content before sharing, and provide a file only if you have permission.
+
+The bundled DocViewKit Viewer includes every available format and is licensed under Apache-2.0. Third-party components retain their included notices. DocViewKit Omni is powered by [DocViewKit Viewer](https://docviewkit.com/).
+
+[Privacy Policy](https://docviewkit.com/privacy/docviewkit-omni/) · [End User License Agreement](https://docviewkit.com/license/docviewkit-omni/) · [Report an issue](https://github.com/docviewkit/docviewkit-omni-ide/issues)
+
+Both adapters pin the unmodified `@docviewkit/viewer@0.2.79` package as their parser and renderer.
 
 ## Architecture
 
@@ -36,7 +80,7 @@ JAVA_HOME=/path/to/jdk-21 ./jetbrains/gradlew -p jetbrains clean test buildPlugi
 npm run test:packages
 ```
 
-The browser smoke requires Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`, or set `DOCVIEWKIT_CHROME`. Outputs are `vscode/docviewkit-omni-0.1.25.vsix` and `jetbrains/build/distributions/docviewkit-omni-0.1.25.zip`.
+The browser smoke requires Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`, or set `DOCVIEWKIT_CHROME`. Outputs are `vscode/docviewkit-omni-0.1.26.vsix` and `jetbrains/build/distributions/docviewkit-omni-0.1.26.zip`.
 
 Document bytes stay in the IDE/Webview/JCEF process. Runtime scripts, fonts, Wasm, and format packs come only from the packaged Viewer artifact; document links are handed to the host after protocol validation.
 

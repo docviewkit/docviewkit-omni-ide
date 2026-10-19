@@ -42,6 +42,16 @@ try {
   unpack(jar, jarRoot);
 
   const vscodePackage = JSON.parse(await readFile(join(vscode, "extension/package.json"), "utf8"));
+  assert.equal(vscodePackage.version, vscodeVersion);
+  const packagedDescriptions = [
+    await readFile(join(vscode, "extension/readme.md"), "utf8"),
+    await readFile(join(jarRoot, "META-INF/plugin.xml"), "utf8"),
+  ];
+  for (const description of packagedDescriptions) {
+    for (const heading of ["What you can preview", "Reading tools", "Privacy and workspaces", "Compatibility and limits", "Installation and requirements", "Troubleshooting"]) {
+      assert.ok(description.includes(heading), `Packaged product description missing: ${heading}`);
+    }
+  }
   assert.ok(!(await readdir(join(vscode, "extension"))).some(name => name.endsWith(".vsix.sha256")),
     "VSIX must not contain checksums left over from an earlier package build");
   assert.deepEqual(await readFile(join(vscode, "extension/dist/viewer.js")), await readFile(join(root, "vscode/dist/viewer.js")),

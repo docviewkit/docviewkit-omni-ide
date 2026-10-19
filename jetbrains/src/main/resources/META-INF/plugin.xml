@@ -3,28 +3,85 @@
   <name>DocViewKit Omni</name>
   <vendor url="https://docviewkit.com">DocViewKit</vendor>
   <description><![CDATA[
-    <p>Preview Office, PDF, OFD, OpenDocument, and iWork files without leaving your JetBrains IDE. Documents stay on your device or IDE-managed remote workspace—no uploads and no conversion server.</p>
-    <h2>Open a document</h2>
-    <p>Open a supported file normally. DocViewKit Omni renders it in a read-only editor with navigation, zoom, search, text selection, safe hyperlinks, and interaction modes where supported.</p>
-    <h2>Why DocViewKit Omni?</h2>
-    <ul>
-      <li><b>Documents stay private:</b> parsing, rendering, and search run locally. The plugin does not upload documents or send file names and paths to a remote service.</li>
-      <li><b>No conversion server:</b> preview files without a document-conversion backend.</li>
-      <li><b>Broad format support, free:</b> view modern and legacy Office, PDF, OFD, OpenDocument, Apple iWork, WPS Office, XPS, RTF, and CSV files.</li>
-      <li><b>Fast and lightweight:</b> format components load on demand for faster startup and lower resource use.</li>
-      <li><b>Safe, read-only viewing:</b> active document content is not executed, and isolated resource failures do not unnecessarily hide the rest of the document.</li>
-      <li><b>IDE-native behavior:</b> files load through IntelliJ Platform APIs, refresh when changed, and follow the IDE theme and language.</li>
-    </ul>
-    <h2>Supported formats</h2>
-    <p>DOCX, DOCM, DOTX, DOTM, DOC, RTF, WPS; XLSX, XLSM, XLTX, XLTM, XLS, CSV, ET; PPTX, PPTM, PPSX, PPSM, POTX, POTM, PPT, DPS; ODT, OTT, FODT, ODS, OTS, FODS, ODP, OTP, FODP; Pages, Numbers, Keynote; PDF, OFD, XPS, and OXPS.</p>
-    <h2>OFD preview</h2>
-    <p>Preview OFD 1.0 and 1.1 fixed-layout documents (<code>.ofd</code>) locally in a read-only editor, without uploading them or using a conversion server. Open an OFD file normally to view its document content and page layout. Rendering covers the supported subset of OFD; the plugin does not provide trusted digital-signature validation.</p>
-    <p>The bundled Viewer includes every available format and is licensed under Apache-2.0. DocViewKit Omni is powered by DocViewKit Viewer.</p>
+<p>Preview Office, PDF, OFD, OpenDocument, and iWork files without leaving your JetBrains IDE. Documents stay on your device or IDE-managed remote workspace—no uploads and no conversion server.</p>
+<p>DocViewKit Omni is a read-only document previewer for developers and technical teams. Read specifications, spreadsheets, presentations, reports, and reference documents alongside your code. The bundled DocViewKit Viewer parses and renders supported documents inside the IDE; no Office installation, document upload, account sign-in, or conversion server is required to preview files. Every available format is included for free.</p>
+<h2>What you can preview</h2>
+<table>
+<thead>
+<tr>
+<th>Document family</th>
+<th>File extensions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Word and rich text</td>
+<td><code>docx</code>, <code>docm</code>, <code>dotx</code>, <code>dotm</code>, <code>doc</code>, <code>rtf</code></td>
+</tr>
+<tr>
+<td>Excel and tabular data</td>
+<td><code>xlsx</code>, <code>xlsm</code>, <code>xltx</code>, <code>xltm</code>, <code>xls</code>, <code>csv</code></td>
+</tr>
+<tr>
+<td>PowerPoint</td>
+<td><code>pptx</code>, <code>pptm</code>, <code>ppsx</code>, <code>ppsm</code>, <code>potx</code>, <code>potm</code>, <code>ppt</code></td>
+</tr>
+<tr>
+<td>OpenDocument text</td>
+<td><code>odt</code>, <code>ott</code>, <code>fodt</code></td>
+</tr>
+<tr>
+<td>OpenDocument spreadsheets</td>
+<td><code>ods</code>, <code>ots</code>, <code>fods</code></td>
+</tr>
+<tr>
+<td>OpenDocument presentations</td>
+<td><code>odp</code>, <code>otp</code>, <code>fodp</code></td>
+</tr>
+<tr>
+<td>Apple iWork</td>
+<td><code>pages</code>, <code>numbers</code>, <code>key</code></td>
+</tr>
+<tr>
+<td>WPS Office</td>
+<td><code>wps</code>, <code>et</code>, <code>dps</code></td>
+</tr>
+<tr>
+<td>Fixed-layout documents</td>
+<td><code>pdf</code>, <code>ofd</code>, <code>xps</code>, <code>oxps</code></td>
+</tr>
+</tbody>
+</table>
+<p>Rendering depth varies by format and document.</p>
+<h2>Reading tools</h2>
+<ul>
+<li><strong>Navigation:</strong> browse document pages, presentation slides, and workbook sheets; use thumbnails where the format supports them.</li>
+<li><strong>Zoom:</strong> inspect small text, tables, diagrams, and other document details at a comfortable scale.</li>
+<li><strong>Search:</strong> find document text and navigate to matching content where supported.</li>
+<li><strong>Text selection:</strong> select and copy readable text where supported by the format and interaction mode.</li>
+<li><strong>Interaction modes and external links:</strong> switch between available reading interactions; validated external links open through the IDE's normal handler.</li>
+<li><strong>IDE integration:</strong> previews follow IDE theme changes and use the IDE language where a matching Viewer translation is available. Files refresh when the host reports a change, and preview resources are released when the editor closes.</li>
+</ul>
+<h2>Privacy and workspaces</h2>
+<p>Parsing, rendering, and search run inside the IDE's preview environment. The plugin does not upload document contents or send file names and paths to a remote service. Runtime scripts, fonts, Wasm, and format components are bundled with the extension; format components load on demand without downloading remote executable code.</p>
+<p>Files are read through the IDE's filesystem and permission APIs. In an IDE-managed remote workspace, file access follows that host's connection and permissions. Document bytes are passed to the preview environment, so a remote workspace does not imply that all processing stays on the remote machine. Opening an external link uses the IDE's usual external application or browser and can contact that destination.</p>
+<h2>Compatibility and limits</h2>
+<p>DocViewKit Omni is read-only. Document editing, annotations, and format conversion are outside its scope. Macros and active document content are not executed. Print and fullscreen controls are disabled in the IDE integration.</p>
+<p>Layout, fonts, complex objects, and embedded resources depend on the format and bundled Viewer version. Complex or older documents, including some legacy iWork variants, may be incomplete or unsupported. Isolated object or resource failures are handled on a best-effort basis so usable content can remain visible. Preview support does not guarantee that every feature of the original authoring application is reproduced.</p>
+<h3>OFD preview</h3>
+<p>Preview OFD 1.0 and 1.1 fixed-layout documents (<code>.ofd</code>) locally in a read-only editor, without uploading them or using a conversion server. Open an OFD file normally to view its document content and page layout. Rendering covers the supported subset of OFD; the plugin does not provide trusted digital-signature validation.</p>
+<h2>Installation and requirements</h2>
+<p>Requires a compatible JetBrains IDE based on IntelliJ Platform <strong>2025.2 or newer</strong> (build <strong>252+</strong>) and a bundled JetBrains Runtime with <strong>JCEF</strong>. Use the versions supported by the plugin's Marketplace compatibility listing. If JCEF is unavailable, the plugin shows an explicit diagnostic; it does not substitute an image preview or a remote conversion service.</p>
+<p>Install <strong>DocViewKit Omni</strong> through <strong>Settings → Plugins → Marketplace</strong>, then open a supported file in the IDE. To install an offline build, download the JetBrains ZIP from the available release or build artifacts and use <strong>Install Plugin from Disk…</strong>. Supported local files can be previewed without a network connection after installation. IDE-managed remote workspace behavior depends on the host's filesystem and browser support.</p>
+<h2>Troubleshooting</h2>
+<p>If JCEF is unavailable, switch to the IDE's bundled JetBrains Runtime with JCEF. If a document renders incorrectly, copy the relevant DocViewKit Omni messages from the IDE log and include the plugin version, IDE version, file format, and reproduction steps in an <a href="https://github.com/docviewkit/docviewkit-omni-ide/issues">issue</a>. Remove private paths or document content before sharing; attach a document only if you have permission.</p>
+<p>The bundled DocViewKit Viewer includes every available format and is licensed under Apache-2.0. Third-party components retain their included notices. DocViewKit Omni is powered by <a href="https://docviewkit.com/">DocViewKit Viewer</a>.</p>
+<p><a href="https://docviewkit.com/privacy/docviewkit-omni/">Privacy Policy</a> · <a href="https://docviewkit.com/license/docviewkit-omni/">End User License Agreement</a> · <a href="https://github.com/docviewkit/docviewkit-omni-ide/issues">Report an issue</a></p>
   ]]></description>
   <change-notes><![CDATA[
-    <p><b>0.1.25</b></p>
+    <p><b>0.1.26</b></p>
     <ul>
-      <li>Added dual-market VS Code distribution with matching VSIX release downloads and SHA-256 verification. Both adapters retain DocViewKit Viewer 0.2.79.</li>
+      <li>Expanded product descriptions with every registered format, reading tools, privacy and remote workspace behavior, installation requirements, compatibility limits, and troubleshooting. Viewer remains 0.2.79.</li>
     </ul>
   ]]></change-notes>
   <depends>com.intellij.modules.platform</depends>
