@@ -59,7 +59,7 @@ The bundled DocViewKit Viewer includes every available format and is licensed un
 
 [Privacy Policy](https://docviewkit.com/privacy/docviewkit-omni/) · [End User License Agreement](https://docviewkit.com/license/docviewkit-omni/) · [Report an issue](https://github.com/docviewkit/docviewkit-omni-ide/issues)
 
-Both adapters pin the unmodified `@docviewkit/viewer@0.2.79` package as their parser and renderer.
+Both adapters pin the unmodified `@docviewkit/viewer@0.2.80` package as their parser and renderer.
 
 ## Architecture
 
@@ -80,7 +80,7 @@ JAVA_HOME=/path/to/jdk-21 ./jetbrains/gradlew -p jetbrains clean test buildPlugi
 npm run test:packages
 ```
 
-The browser smoke requires Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`, or set `DOCVIEWKIT_CHROME`. Outputs are `vscode/docviewkit-omni-0.1.26.vsix` and `jetbrains/build/distributions/docviewkit-omni-0.1.26.zip`.
+The browser smoke requires Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`, or set `DOCVIEWKIT_CHROME`. Outputs are `vscode/docviewkit-omni-0.1.27.vsix` and `jetbrains/build/distributions/docviewkit-omni-0.1.27.zip`.
 
 Document bytes stay in the IDE/Webview/JCEF process. Runtime scripts, fonts, Wasm, and format packs come only from the packaged Viewer artifact; document links are handed to the host after protocol validation.
 
